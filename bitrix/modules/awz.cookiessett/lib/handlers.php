@@ -6,6 +6,24 @@ use Bitrix\Main\Config\Option;
 
 class Handlers {
 
+    public static function OnPageStart(){
+        $context = Application::getInstance()->getContext();
+        if($context->getRequest()->isAdminSection()) return;
+        if(
+            Option::get("awz.cookiessett", 'SHOW', 'N', SITE_ID)==="Y"
+        ){
+            $strParams = Option::get("awz.cookiessett", 'PARAMS', '', SITE_ID);
+            $strArParams = unserialize(
+                $strParams,
+                ['allowed_classes'=>false]
+            );
+            \CJSCore::Init(['ajax']);
+            if($strArParams['BUTTON_SETT']){
+                \CJSCore::Init(['popup']);
+            }
+        }
+    }
+
     public static function OnEndBufferContent(&$content){
         $context = Application::getInstance()->getContext();
         if($context->getRequest()->isAdminSection()) return;
@@ -22,6 +40,8 @@ class Handlers {
             );
             $strArParams["INLINE_STYLES"]="Y";
             if(!is_array($strArParams)) $strArParams = ['COMPONENT_TEMPLATE'=>".default"];
+            //print_r($strArParams);
+            //die();
             $APPLICATION->IncludeComponent("awz:cookies.sett",".default",
                 $strArParams, null, array("HIDE_ICONS"=>"Y")
             );

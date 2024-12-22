@@ -120,15 +120,18 @@ class awz_cookiessett extends CModule
     {
         $eventManager = EventManager::getInstance();
         $eventManager->registerEventHandlerCompatible("main", "OnEndBufferContent",
-            $this->MODULE_ID, '\\Awz\\Cookiessett\\Handlers', 'OnEndBufferContent'
+            $this->MODULE_ID, '\\Awz\\CookiesSett\\Handlers', 'OnEndBufferContent'
+        );
+        $eventManager->registerEventHandlerCompatible("main", "OnPageStart",
+            $this->MODULE_ID, '\\Awz\\CookiesSett\\Handlers', 'OnPageStart'
         );
         $eventManager->registerEventHandlerCompatible(
             'main', 'OnAfterUserUpdate',
-            $this->MODULE_ID, '\\Awz\\Cookiessett\\Access\\Handlers', 'OnAfterUserUpdate'
+            $this->MODULE_ID, '\\Awz\\CookiesSett\\Access\\Handlers', 'OnAfterUserUpdate'
         );
         $eventManager->registerEventHandlerCompatible(
             'main', 'OnAfterUserAdd',
-            $this->MODULE_ID, '\\Awz\\Cookiessett\\Access\\Handlers', 'OnAfterUserUpdate'
+            $this->MODULE_ID, '\\Awz\\CookiesSett\\Access\\Handlers', 'OnAfterUserUpdate'
         );
         return true;
     }
@@ -138,15 +141,19 @@ class awz_cookiessett extends CModule
         $eventManager = EventManager::getInstance();
         $eventManager->unRegisterEventHandler(
             'main', 'OnEndBufferContent',
-            $this->MODULE_ID, '\\Awz\\Cookiessett\\Handlers', 'OnEndBufferContent'
+            $this->MODULE_ID, '\\Awz\\CookiesSett\\Handlers', 'OnEndBufferContent'
+        );
+        $eventManager->unRegisterEventHandler(
+            'main', 'OnPageStart',
+            $this->MODULE_ID, '\\Awz\\CookiesSett\\Handlers', 'OnPageStart'
         );
         $eventManager->unRegisterEventHandler(
             'sale', 'OnAfterUserUpdate',
-            $this->MODULE_ID, '\\Awz\\Cookiessett\\Access\\Handlers', 'OnAfterUserUpdate'
+            $this->MODULE_ID, '\\Awz\\CookiesSett\\Access\\Handlers', 'OnAfterUserUpdate'
         );
         $eventManager->unRegisterEventHandler(
             'sale', 'OnAfterUserAdd',
-            $this->MODULE_ID, '\\Awz\\Cookiessett\\Access\\Handlers', 'OnAfterUserUpdate'
+            $this->MODULE_ID, '\\Awz\\CookiesSett\\Access\\Handlers', 'OnAfterUserUpdate'
         );
         return true;
     }
