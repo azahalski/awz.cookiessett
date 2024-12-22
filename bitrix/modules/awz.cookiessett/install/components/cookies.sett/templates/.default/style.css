@@ -1,0 +1,209 @@
+
+.awz_cookies_sett__message {display: block;position: fixed;z-index: 1049;
+    width:45%;max-width:580px;
+    right:10px;bottom:10px;
+    font-size:0.8em;line-height:1.3em;border-radius:10px;
+}
+.awz_cookies_sett__admin .awz_cookies_sett__message {position: static;width:100%;
+font-size: 1em;line-height:1.3em;
+}
+.awz_cookies_sett__container {display:block;padding:0.8em 1.5em;}
+.awz_cookies_sett__btn {padding:0.4em 0.8em;margin:0.3em;display:inline-block;
+    border-radius:5px;text-decoration: none;}
+
+.awz_cookies_sett__btn {cursor: pointer;}
+.awz_cookies_sett__btn:hover {cursor: pointer;}
+.awz_cookies_sett__row {
+    display: flex;  align-content: center;  justify-content: center;
+    align-items: center;  flex-wrap: nowrap;  flex-direction: row;
+}
+.awz_cookies_sett__col {width:100%;}
+.awz_cookies_sett__col__right {text-align: center;width:auto;}
+.awz_cookies_sett__agr_link {text-decoration: underline;}
+
+.awz_cookies_sett__detail {padding:1em 2em;font-size:1.1em;line-height:1.3em;}
+.awz_cookies_sett__detail-row {display:block;clear:both;overflow:hidden;}
+.awz_cookies_sett__detail-alert {color:red;margin-bottom:1em;font-weight:bold;}
+.awz_cookies_sett__detail-checkbox-text {display:block;position:relative;margin-bottom:0.5em;}
+.awz_cookies_sett__detail-title {font-weight:bold;padding:3px 0;display:block;}
+.awz_cookies_sett__save, .awz_cookies_sett__save:hover {background:red;color:#ffffff;padding:0.6em 1.5em;text-decoration:none;
+display:inline-block;
+    margin-top:1em;
+    border:none;
+    outline: none;
+}
+
+.awz_cookies_sett__detail-checkbox-wrapper-42 {display:block;float:left;margin-right:5px;}
+.awz_cookies_sett__detail-checkbox-wrapper-42 .dsbl {opacity:0.35;}
+.awz_cookies_sett__detail-checkbox-wrapper-42 input[type="checkbox"] {
+    display: none;
+    visibility: hidden;
+}
+
+.awz_cookies_sett__detail-checkbox-wrapper-42 label {
+    display: inline-block;
+    float:left;
+    margin-top:1px;
+}
+
+.awz_cookies_sett__detail-checkbox-wrapper-42 .cbx {
+    position: relative;
+    top: 1px;
+    width: 17px;
+    height: 17px;
+    border:1px solid #000000;
+    border-radius: 3px;
+    vertical-align: middle;
+    transition: background 0.1s ease;
+    cursor: pointer;
+}
+.awz_cookies_sett__detail-checkbox-wrapper-42 .cbx:after {
+    content: '';
+    position: absolute;
+    top: 1px;
+    left: 5px;
+    width: 5px;
+    height: 11px;
+    opacity: 0;
+    transform: rotate(45deg) scale(0);
+    border-right: 2px solid #000;
+    border-bottom: 2px solid #000;
+    transition: all 0.3s ease;
+    transition-delay: 0.15s;
+}
+.awz_cookies_sett__detail-checkbox-wrapper-42 .lbl {
+    margin-left: 5px;
+    vertical-align: middle;
+    cursor: pointer;
+}
+.awz_cookies_sett__detail-checkbox-wrapper-42 input[type="checkbox"]:checked ~ .cbx {
+    border-color: #000000;
+    animation: awz-autform2-checkbox-jelly-42 0.6s ease;
+}
+.awz_cookies_sett__detail-checkbox-wrapper-42 input[type="checkbox"]:checked ~ .cbx:after {
+    opacity: 1;
+    transform: rotate(45deg) scale(1);
+}
+.awz_cookies_sett__detail-checkbox-wrapper-42 .cntr {
+    position: absolute;
+    top: 50%;
+    left: 0;
+    width: 100%;
+    text-align: center;
+}
+@-moz-keyframes awz-autform2-checkbox-jelly-42 {
+    from {
+        transform: scale(1, 1);
+    }
+    30% {
+        transform: scale(1.25, 0.75);
+    }
+    40% {
+        transform: scale(0.75, 1.25);
+    }
+    50% {
+        transform: scale(1.15, 0.85);
+    }
+    65% {
+        transform: scale(0.95, 1.05);
+    }
+    75% {
+        transform: scale(1.05, 0.95);
+    }
+    to {
+        transform: scale(1, 1);
+    }
+}
+@-webkit-keyframes awz-autform2-checkbox-jelly-42 {
+    from {
+        transform: scale(1, 1);
+    }
+    30% {
+        transform: scale(1.25, 0.75);
+    }
+    40% {
+        transform: scale(0.75, 1.25);
+    }
+    50% {
+        transform: scale(1.15, 0.85);
+    }
+    65% {
+        transform: scale(0.95, 1.05);
+    }
+    75% {
+        transform: scale(1.05, 0.95);
+    }
+    to {
+        transform: scale(1, 1);
+    }
+}
+@-o-keyframes awz-autform2-checkbox-jelly-42 {
+    from {
+        transform: scale(1, 1);
+    }
+    30% {
+        transform: scale(1.25, 0.75);
+    }
+    40% {
+        transform: scale(0.75, 1.25);
+    }
+    50% {
+        transform: scale(1.15, 0.85);
+    }
+    65% {
+        transform: scale(0.95, 1.05);
+    }
+    75% {
+        transform: scale(1.05, 0.95);
+    }
+    to {
+        transform: scale(1, 1);
+    }
+}
+@keyframes awz-autform2-checkbox-jelly-42 {
+    from {
+        transform: scale(1, 1);
+    }
+    30% {
+        transform: scale(1.25, 0.75);
+    }
+    40% {
+        transform: scale(0.75, 1.25);
+    }
+    50% {
+        transform: scale(1.15, 0.85);
+    }
+    65% {
+        transform: scale(0.95, 1.05);
+    }
+    75% {
+        transform: scale(1.05, 0.95);
+    }
+    to {
+        transform: scale(1, 1);
+    }
+}
+
+.awz_cookies_sett__bg1 {background: #171241;}
+.awz_cookies_sett__bg2 {background: #ffffff;}
+.awz_cookies_sett__bg2:hover {background: #ffe40e;}
+.awz_cookies_sett__bg3 {background: #f1d600;}
+.awz_cookies_sett__bg3:hover {background: #ffe40e;}
+.awz_cookies_sett__color1 {color:#171241;}
+.awz_cookies_sett__color2 {color:#ffffff;}
+a.awz_cookies_sett__color2:hover {color:#ffe40e;}
+
+#popup-window-content-awz_cmp_cookies {max-height:100%;}
+
+@media (max-width: 767.98px) {
+    .awz_cookies_sett__message{
+        width:100%;
+        right:0;
+        bottom:0;
+        border-radius:0px;
+        text-align: center;
+    }
+    .awz_cookies_sett__message br {display:none;}
+    .awz_cookies_sett__row {flex-direction: column;}
+    .awz_cookies_sett__col__right {padding-top:0.3em;}
+}

@@ -1,0 +1,4 @@
+<?php
+$MESS['AWZ_COOKIES_SETT_PARAM_DESCR_NAME'] = 'AWZ: Согласие о cookies';
+$MESS['AWZ_COOKIES_SETT_PARAM_DESCR_GROUP'] = 'Zahalski.dev';
+$MESS['AWZ_COOKIES_SETT_PARAM_DESCR_GROUP_USER'] = 'Пользователь';

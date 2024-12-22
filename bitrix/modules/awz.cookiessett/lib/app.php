@@ -14,7 +14,12 @@ class App {
     const NO_SITE_ID = 'all';
 
     /**
-     * Технические cookies
+     * Полный запрет cookies
+     */
+    const USER_DECLINE = 1;
+
+    /**
+     * Технические cookies, обязательно для сохранения маски прав в cookies
      */
     const USER_REQUIRE = 2;
 
@@ -36,7 +41,7 @@ class App {
     /**
      * Все cookies, без ограничения
      */
-    const ASSEPT_ALL = 30;
+    const ACCEPT_ALL = 31;
 
     protected string $siteId;
 
@@ -50,6 +55,7 @@ class App {
     private function __construct(string $siteId)
     {
         $this->isEmpty = true;
+        $this->user_perm = 0;
         if(!$siteId){
             $siteId = Application::getInstance()->getContext()->getSite();
         }
@@ -75,15 +81,6 @@ class App {
         return self::$_instances[$siteId];
     }
 
-    public function getAllMask(){
-        return [
-            self::USER_REQUIRE,
-            self::USER_TECH,
-            self::MARKET_TECH,
-            self::MARKET_EXT
-        ];
-    }
-
     /**
      * Установка маски cookies
      *
@@ -92,7 +89,7 @@ class App {
      */
     public function set($mask = self::USER_REQUIRE): App
     {
-        $this->user_perm = $mask;
+        $this->user_perm = $mask & self::ACCEPT_ALL;
         return $this;
     }
 
@@ -104,15 +101,8 @@ class App {
      */
     public function add($mask): App
     {
-        if($mask === self::ASSEPT_ALL){
-            $this->user_perm = self::ASSEPT_ALL;
-        }else{
-            foreach($this->getAllMask() as $m){
-                if(!$this->check($m) && ($m & $mask)){
-                    $this->user_perm = $this->user_perm | $m;
-                }
-            }
-        }
+        $mask = $mask & self::ACCEPT_ALL;
+        $this->user_perm = $this->user_perm | ($this->user_perm ^ $mask);
         return $this;
     }
 
@@ -124,15 +114,8 @@ class App {
      */
     public function delete($mask): App
     {
-        if($mask === self::ASSEPT_ALL){
-            $this->user_perm = 0;
-        }else{
-            foreach($this->getAllMask() as $m){
-                if($this->check($m) && ($m & $mask)){
-                    $this->user_perm &= ~ $mask;
-                }
-            }
-        }
+        $mask = $mask & self::ACCEPT_ALL;
+        $this->user_perm &= ~ ($this->user_perm & $mask);
         return $this;
     }
 
@@ -143,7 +126,7 @@ class App {
      */
     public function get(): int
     {
-        return $this->user_perm;
+        return $this->user_perm & self::ACCEPT_ALL;
     }
 
     /**
@@ -152,7 +135,7 @@ class App {
      * @param $mask
      * @return bool
      */
-    public function check($mask = self::ASSEPT_ALL):bool
+    public function check($mask = self::ACCEPT_ALL):bool
     {
         return ($this->get() & $mask);
     }
@@ -162,10 +145,17 @@ class App {
         $session = Application::getInstance()->getSession();
         $session->set(self::SESSION_KEY, $this->get());
         if($this->check(self::USER_REQUIRE)){
+            $context->getResponse()->allowPersistentCookies(true);
             $cookie = new Cookie(self::SESSION_KEY, $this->get());
-            $cookie->setDomain($context->getServer()->getHttpHost())
-                ->setPath('/')->setSecure(false)->setHttpOnly(false);
+            $cookie->setPath('/');
             $context->getResponse()->addCookie($cookie);
+        }else{
+            $context->getResponse()->allowPersistentCookies(false);
+            foreach ($context->getRequest()->getCookieList() as $cookieName=>$cookieValue){
+                $cookie = new Cookie($cookieName, $cookieValue, -1);
+                $cookie->setPath('/');
+                $context->getResponse()->addCookie($cookie);
+            }
         }
         $this->isEmpty = false;
     }
