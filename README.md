@@ -12,7 +12,7 @@
 
 <!-- desc-end -->
 
-<!-- docs-start -->
+<!-- dev-start -->
 
 ## Документация для разработчиков
 
@@ -40,7 +40,7 @@ if(\Bitrix\Main\Loader::includeModule('awz.cookiessett')){
 }
 ```
 
-<!-- docs-end -->
+<!-- dev-end -->
 
 <!-- cl-start -->
 ## История версий
