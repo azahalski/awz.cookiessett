@@ -56,14 +56,11 @@ class App {
     {
         $this->isEmpty = true;
         $this->user_perm = 0;
-        if(!$siteId){
-            $siteId = Application::getInstance()->getContext()->getSite();
-        }
-        $this->siteId = (string) $siteId;
+        $this->siteId = $siteId;
         $request = Application::getInstance()->getContext()->getRequest();
         $session = Application::getInstance()->getSession();
-        $cookieMask = $request->getCookie(self::SESSION_KEY);
-        if(!$cookieMask) $cookieMask = $session->get(self::SESSION_KEY);
+        $cookieMask = $request->getCookie(self::SESSION_KEY.'_'.$this->siteId);
+        if(!$cookieMask) $cookieMask = $session->get(self::SESSION_KEY.'_'.$this->siteId);
         if($cookieMask) $this->isEmpty = false;
         $this->set($cookieMask);
     }
@@ -74,6 +71,9 @@ class App {
      */
     public static function getInstance(string $siteId=''): App
     {
+        if(!$siteId){
+            $siteId = Application::getInstance()->getContext()->getSite();
+        }
         if(!$siteId) $siteId = self::NO_SITE_ID;
         if(!isset(self::$_instances[$siteId])){
             self::$_instances[$siteId] = new self($siteId);
@@ -143,10 +143,10 @@ class App {
     public function save(){
         $context = Application::getInstance()->getContext();
         $session = Application::getInstance()->getSession();
-        $session->set(self::SESSION_KEY, $this->get());
+        $session->set(self::SESSION_KEY.'_'.$this->siteId, $this->get());
         if($this->check(self::USER_REQUIRE)){
             $context->getResponse()->allowPersistentCookies(true);
-            $cookie = new Cookie(self::SESSION_KEY, $this->get());
+            $cookie = new Cookie(self::SESSION_KEY.'_'.$this->siteId, $this->get());
             $cookie->setPath('/');
             $context->getResponse()->addCookie($cookie);
         }else{

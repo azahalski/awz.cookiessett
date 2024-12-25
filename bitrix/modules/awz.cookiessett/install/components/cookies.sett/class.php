@@ -87,7 +87,8 @@ class AwzCookiesSettComponent extends CBitrixComponent implements Controllerable
     protected function listKeysSignedParameters(): array
     {
         return [
-            'COMPONENT_TEMPLATE'
+            'COMPONENT_TEMPLATE',
+            'SITE_ID'
         ];
     }
 
@@ -139,8 +140,7 @@ class AwzCookiesSettComponent extends CBitrixComponent implements Controllerable
     public function allowAction()
     {
         if(!$this->isRequiredModule()) return '';
-
-        $app = CookieApp::getInstance();
+        $app = CookieApp::getInstance($this->arParams['SITE_ID']);
         $request = Application::getInstance()->getContext()->getRequest();
         if($request->get('awz_cookies_mode_all')=='Y'){
             $app->set(CookieApp::ACCEPT_ALL);

@@ -85,7 +85,26 @@ $tabControl->Begin();
         </td>
     </tr>
     <?
+    $currentSite = $request->get('SITE_ID') ? $request->get('SITE_ID') : $siteRes[0]['LID'];
+    ?>
+    <tr>
+        <td>
+            <?=Loc::getMessage('AWZ_COOKIESSETT_OPT_SITE_ID')?>
+        </td>
+        <td>
+            <select name="SITE_ID" onchange="window.location.href=this.value;">
+                <?foreach($siteRes as $arSite){?>
+                    <option value="<?=$saveUrl?>&SITE_ID=<?=$arSite['LID']?>"<?if($arSite['LID']==$currentSite){?> selected="selected"<?}?>>
+                        [<?=$arSite['LID']?>] - <?=$arSite['NAME']?>
+                    </option>
+                <?}?>
+            </select>
+        </td>
+    </tr>
+    <?
+
     foreach($siteRes as $arSite){
+        if($currentSite!=$arSite['LID']) continue;
         $valParams = unserialize(Option::get($module_id, "PARAMS", "N",$arSite['LID']),['allowed_classes'=>false]);
         if(!is_array($valParams)){
             $valParams = [
@@ -102,7 +121,7 @@ $tabControl->Begin();
         ?>
         <tr class="heading">
             <td colspan="2">
-                <b><?=$arSite['NAME']?></b>
+                <b>[<?=$arSite['LID']?>] - <?=$arSite['NAME']?></b>
             </td>
         </tr>
 
