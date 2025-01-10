@@ -85,7 +85,7 @@ $tabControl->Begin();
         </td>
     </tr>
     <?
-    $currentSite = $request->get('SITE_ID') ? $request->get('SITE_ID') : $siteRes[0]['LID'];
+    $currentSite = $request->get('SITE_ID') ? str_replace($saveUrl.'&SITE_ID=','',$request->get('SITE_ID')) : current($siteRes)['LID'];
     ?>
     <tr>
         <td>

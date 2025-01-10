@@ -17,7 +17,7 @@ use Bitrix\Main\Application;
                 }
                 $arParams['MSG'] = str_replace('#LINK#',$link,$arParams['MSG']);
                 ?>
-                <?=$arParams['MSG']?>
+                <?=htmlspecialcharsBack($arParams['MSG'])?>
             </div>
             <div class="awz_cookies_sett__col awz_cookies_sett__col__right">
                 <?if($arParams['BUTTON_OK']){?>

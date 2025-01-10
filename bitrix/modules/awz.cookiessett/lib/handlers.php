@@ -40,15 +40,13 @@ class Handlers {
             );
             $strArParams["INLINE_STYLES"]="Y";
             if(!is_array($strArParams)) $strArParams = ['COMPONENT_TEMPLATE'=>".default"];
-            //print_r($strArParams);
-            //die();
             $APPLICATION->IncludeComponent("awz:cookies.sett",".default",
                 $strArParams, null, array("HIDE_ICONS"=>"Y")
             );
             $html = ob_get_contents();
             $html = preg_replace("/(\s+)/is"," ", $html);
             $html = str_replace(["\n","\t","\r"],"", $html);
-            $html = preg_replace("/\s?([:,;{>}=])\s?/is","$1", $html);
+            $html = preg_replace("/\s?([:;{>}=])\s?/is","$1", $html);
 
             ob_end_clean();
             $content = str_replace('</body>',$html."\n".'</body>',$content);
