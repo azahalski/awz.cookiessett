@@ -39,6 +39,7 @@ class Handlers {
                 ['allowed_classes'=>false]
             );
             $strArParams["INLINE_STYLES"]="Y";
+            $strArParams["SITE_ID"] = SITE_ID;
             if(!is_array($strArParams)) $strArParams = ['COMPONENT_TEMPLATE'=>".default"];
             $APPLICATION->IncludeComponent("awz:cookies.sett",".default",
                 $strArParams, null, array("HIDE_ICONS"=>"Y")
