@@ -158,6 +158,10 @@ class App {
             }
         }
         $this->isEmpty = false;
+        if(\Bitrix\Main\Loader::includeModule('awz.utm')){
+            $appUtm = \Awz\Utm\App::getInstance();
+            $appUtm->saveCookies();
+        }
     }
 
     public function isEmpty(){
