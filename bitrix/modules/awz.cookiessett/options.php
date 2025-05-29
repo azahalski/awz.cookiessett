@@ -40,6 +40,7 @@ if ($request->getRequestMethod()==='POST' && AccessController::isEditSettings() 
     $PARAMS = $request->get('PARAMS');
     if(!is_array($PARAMS)) $PARAMS = [];
     foreach($siteRes as $arSite){
+		if(!isset($PARAMS[$arSite['LID']])) continue;
         if(!isset($shows[$arSite['LID']]) || !$shows[$arSite['LID']]) {
             $shows[$arSite['LID']] = 'N';
         }
