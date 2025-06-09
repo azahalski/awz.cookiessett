@@ -2,8 +2,8 @@
 $MESS["AWZ_COOKIESSETT_OPT_TITLE"] = "Настройки модуля AWZ: Согласие о cookies";
 $MESS["AWZ_COOKIESSETT_OPT_SECT1"] = "Настройки модуля";
 $MESS["AWZ_COOKIESSETT_OPT_SECT2"] = "Права доступа";
-$MESS["AWZ_COOKIESSETT_OPT_SHOW_DESC"] = "Вы можете самостоятельно разместить компонент перед закрывающим тегом BODY вашего шаблона или отметить публикацию компонента на обработчике.";
-$MESS["AWZ_COOKIESSETT_OPT_SHOW"] = "Публиковать компонент";
+$MESS["AWZ_COOKIESSETT_OPT_SHOW_DESC"] = "Вы можете самостоятельно разместить компонент перед закрывающим тегом BODY вашего шаблона (<b>Рекомендуется!</b> - <a target=\"_blank\" href=\"https://zahalski.dev/modules/awz.cookiessett/docs/\">для разработчиков</a>).<br>Или отметить публикацию компонента на обработчике (опция ниже).";
+$MESS["AWZ_COOKIESSETT_OPT_SHOW"] = "Публиковать компонент (обработчик onEndBufferContent)";
 $MESS["AWZ_COOKIESSETT_OPT_L_BTN_SAVE"] = "Сохранить настройки";
 $MESS["AWZ_COOKIESSETT_OPT_PRM_BUTTON_OK"] = "Текст на кнопке согласия";
 $MESS["AWZ_COOKIESSETT_OPT_THEME"] = "Цветовая схема";

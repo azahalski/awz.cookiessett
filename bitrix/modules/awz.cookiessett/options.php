@@ -79,14 +79,19 @@ $tabControl->Begin();
                         <?=Loc::getMessage('AWZ_COOKIESSETT_OPT_SHOW_DESC')?>
                     </span>
             </div>
-            <textarea style="background: #ffffff;padding:10px;width:100%;height:100px;">
-<?='<?'?>$APPLICATION->IncludeComponent("awz:cookies.sett",".default",
-    Array(
-        "COMPONENT_TEMPLATE" => ".default"
-    ),
-    null, array("HIDE_ICONS"=>"Y")
-);<?='?>'?>
-                </textarea>
+            <textarea style="background: #ffffff;padding:10px;max-width:600px;width:100%;height:170px;font-size:12px;color:#008dba;">
+<?='<?'."\n"?>
+//settings /bitrix/admin/settings.php?lang=ru&mid=awz.cookiessett&mid_menu=1
+$strParams = \Bitrix\Main\Config\Option::get("awz.cookiessett", 'PARAMS', '', SITE_ID);
+$strArParams = unserialize($strParams,['allowed_classes'=>false]);
+if(!is_array($strArParams)) $strArParams = ['COMPONENT_TEMPLATE'=>".default"];
+$strArParams['SITE_ID'] = SITE_ID;
+?>
+<?='<?'."\n"?>
+$APPLICATION->IncludeComponent("awz:cookies.sett",".default",
+    $strArParams, null, array("HIDE_ICONS"=>"Y")
+);
+<?='?>'?></textarea>
         </td>
     </tr>
     <?
