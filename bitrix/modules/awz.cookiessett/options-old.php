@@ -1,8 +1,4 @@
 <?
-if(defined('PHP_VERSION_ID') && PHP_VERSION_ID<80100){
-    include('options-old.php');
-    return;
-}
 require_once($_SERVER["DOCUMENT_ROOT"]."/bitrix/modules/main/include/prolog_admin_before.php");
 
 use Bitrix\Main\Localization\Loc;
@@ -11,33 +7,26 @@ use Bitrix\Main\Loader;
 use Bitrix\Main\Application;
 use Bitrix\Main\UI\Extension;
 use Bitrix\Main\SiteTable;
-use Awz\Cookiessett\Access\AccessController;
 
-Loc::loadMessages(__FILE__);
+Loc::loadMessages(str_replace('-old.php','.php',__FILE__));
 Loc::loadMessages($_SERVER['DOCUMENT_ROOT'].'/bitrix/components/awz/cookies.sett/templates/.default/.parameters.php');
 global $APPLICATION;
 $module_id = "awz.cookiessett";
+$MODULE_RIGHT = $APPLICATION->GetGroupRight($module_id);
 if(!Loader::includeModule($module_id)) return;
 Extension::load('ui.sidepanel-content');
 $request = Application::getInstance()->getContext()->getRequest();
 $APPLICATION->SetTitle(Loc::getMessage('AWZ_COOKIESSETT_OPT_TITLE'));
 
-if($request->get('IFRAME_TYPE')==='SIDE_SLIDER'){
-require($_SERVER["DOCUMENT_ROOT"]."/bitrix/modules/main/include/prolog_admin_after.php");
-require_once('lib/access/include/moduleright.php');
-CMain::finalActions();
-die();
-}
-
-if(!AccessController::isViewSettings())
-$APPLICATION->AuthForm(Loc::getMessage("ACCESS_DENIED"));
+if (! ($MODULE_RIGHT >= "R"))
+    $APPLICATION->AuthForm(Loc::getMessage("ACCESS_DENIED"));
 require($_SERVER["DOCUMENT_ROOT"]."/bitrix/modules/main/include/prolog_admin_after.php");
 
 $siteRes = SiteTable::getList(['select'=>['LID','NAME'],'filter'=>['ACTIVE'=>'Y']])->fetchAll();
 $context = Application::getInstance()->getContext();
 $request = $context->getRequest();
 
-if ($request->getRequestMethod()==='POST' && AccessController::isEditSettings() && $request->get('Update'))
+if ($request->getRequestMethod()==='POST' && $request->get('Update'))
 {
     $shows = $request->get('SHOW');
     if(!is_array($shows)) $shows = [];
@@ -357,13 +346,8 @@ $tabControl->Begin();
     <?
     $tabControl->Buttons();
     ?>
-    <input <?if (!AccessController::isEditSettings()) echo "disabled" ?> type="submit" class="adm-btn-green" name="Update" value="<?=Loc::getMessage('AWZ_COOKIESSETT_OPT_L_BTN_SAVE')?>" />
+    <input type="submit" class="adm-btn-green" name="Update" value="<?=Loc::getMessage('AWZ_COOKIESSETT_OPT_L_BTN_SAVE')?>" />
     <input type="hidden" name="Update" value="Y" />
-    <?if(AccessController::isViewRight()){?>
-        <button class="adm-header-btn adm-security-btn" onclick="BX.SidePanel.Instance.open('<?=$saveUrl?>');return false;">
-            <?=Loc::getMessage('AWZ_COOKIESSETT_OPT_SECT2')?>
-        </button>
-    <?}?>
     <?$tabControl->End();?>
 </form>
 <?
