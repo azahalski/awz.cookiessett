@@ -83,6 +83,21 @@ id = `awz_cookies_sett__settings_custom`
 <p><a class="btn btn-primary" id="awz_cookies_sett__settings_custom">Настроить</a></p>
 ```
 
+также можно получить доступ к глобальному объекту
+window.AwzCookiesSettComponent_Instances и вызвать, настройки, отклонение или подтверждение с любого места.
+
+```js
+/* пример обработчика на jquery обрабатывающего ссылку href="#awz_cookies" и вызывающего настройки */
+$(document).on('click', 'a[href="#awz_cookies"]', function(e){
+    e.preventDefault();
+    var k;
+    for(k in window.AwzCookiesSettComponent_Instances){
+        window.AwzCookiesSettComponent_Instances[k].settings();
+        return false;
+    }
+});
+```
+
 ### пример подключения аналитики
 
 ```php
