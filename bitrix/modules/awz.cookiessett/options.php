@@ -41,6 +41,10 @@ if ($request->getRequestMethod()==='POST' && AccessController::isEditSettings() 
 {
     $shows = $request->get('SHOW');
     if(!is_array($shows)) $shows = [];
+    $DSBL_GET = $request->get('DSBL_GET');
+    if(!is_array($DSBL_GET)) $DSBL_GET = [];
+    $DSBL_REJ = $request->get('DSBL_REJ');
+    if(!is_array($DSBL_REJ)) $DSBL_REJ = [];
     $PARAMS = $request->get('PARAMS');
     if(!is_array($PARAMS)) $PARAMS = [];
     foreach($siteRes as $arSite){
@@ -49,6 +53,8 @@ if ($request->getRequestMethod()==='POST' && AccessController::isEditSettings() 
             $shows[$arSite['LID']] = 'N';
         }
         Option::set($module_id, 'SHOW', $shows[$arSite['LID']], $arSite['LID']);
+        Option::set($module_id, 'DSBL_GET', $DSBL_GET[$arSite['LID']], $arSite['LID']);
+        Option::set($module_id, 'DSBL_REJ', $DSBL_REJ[$arSite['LID']], $arSite['LID']);
         Option::set($module_id, 'PARAMS', serialize($PARAMS[$arSite['LID']]), $arSite['LID']);
     }
 }
@@ -74,12 +80,13 @@ $tabControl->Begin();
     ?>
     <tr>
         <td colspan="2">
+            <div style="float:left;max-width:calc(100% - 240px);">
             <div class="ui-alert ui-alert-primary">
                     <span class="ui-alert-message">
                         <?=Loc::getMessage('AWZ_COOKIESSETT_OPT_SHOW_DESC')?>
                     </span>
             </div>
-            <textarea style="background: #ffffff;padding:10px;max-width:600px;width:100%;height:170px;font-size:12px;color:#008dba;">
+            <textarea style="background: #ffffff;padding:10px;max-width:500px;width:100%;height:170px;font-size:12px;color:#008dba;">
 <?='<?'."\n"?>
 //settings /bitrix/admin/settings.php?lang=ru&mid=awz.cookiessett&mid_menu=1
 $strParams = \Bitrix\Main\Config\Option::get("awz.cookiessett", 'PARAMS', '', SITE_ID);
@@ -92,6 +99,12 @@ $APPLICATION->IncludeComponent("awz:cookies.sett",".default",
     $strArParams, null, array("HIDE_ICONS"=>"Y")
 );
 <?='?>'?></textarea>
+            </div>
+            <?if(!Loader::includeModule('awz.autform')){?>
+                <a href="https://marketplace.1c-bitrix.ru/solutions/awz.autform/" style="position:sticky;text-decoration:none;max-width:200px;background:#fff;float:right;padding:5px;margin:5px;border:1px solid #000000;" target="_blank">
+<?=Loc::getMessage('AWZ_COOKIESSETT_OPT_SHOW_DESC_REK')?>
+                </a>
+            <?}?>
         </td>
     </tr>
     <?
@@ -115,7 +128,10 @@ $APPLICATION->IncludeComponent("awz:cookies.sett",".default",
 
     foreach($siteRes as $arSite){
         if($currentSite!=$arSite['LID']) continue;
-        $valParams = unserialize(Option::get($module_id, "PARAMS", "N",$arSite['LID']),['allowed_classes'=>false]);
+        $valParams = unserialize(
+                Option::get($module_id, "PARAMS", "N",$arSite['LID']),
+                ['allowed_classes'=>false]
+        );
         if(!is_array($valParams)){
             $valParams = [
                 'COMPONENT_TEMPLATE'=>".default",
@@ -125,7 +141,8 @@ $APPLICATION->IncludeComponent("awz:cookies.sett",".default",
                 "BUTTON_SETT"=>Loc::getMessage('AWZ_COOKIES_SETT_PARAM_BUTTON_SETT_DEF'),
                 "LINK_ANCOR"=>Loc::getMessage('AWZ_COOKIES_SETT_PARAM_LINK_ANCOR_DEF'),
                 "MSG"=>Loc::getMessage('AWZ_COOKIES_SETT_PARAM_MSG_DEF'),
-                "CSS"=>[]
+                "CSS"=>[],
+                "FLOAT"=>"BOTTOM_RIGHT"
             ];
         }
         ?>
@@ -145,6 +162,22 @@ $APPLICATION->IncludeComponent("awz:cookies.sett",".default",
                                 <td>
                                     <?$val = Option::get($module_id, "SHOW", "N",$arSite['LID']);?>
                                     <input type="checkbox" value="Y" name="SHOW[<?=$arSite['LID']?>]" <?if ($val=="Y") echo "checked";?>>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td style="width:20%;"><?=Loc::getMessage('AWZ_COOKIESSETT_OPT_DSBL_GET')?></td>
+                                <td>
+                                    <?$val = Option::get($module_id, "DSBL_GET", "",$arSite['LID']);?>
+                                    <input size="38" type="text" value="<?=$val?>" name="DSBL_GET[<?=$arSite['LID']?>]">
+                                </td>
+                            </tr>
+                            <tr>
+                                <td style="width:20%;"><?=Loc::getMessage('AWZ_COOKIESSETT_OPT_DSBL_REJ')?></td>
+                                <td>
+                                    <?$val = Option::get($module_id, "DSBL_REJ", "",$arSite['LID']);?>
+                                    <textarea cols="40" rows="4" name="DSBL_REJ[<?=$arSite['LID']?>]"><?=$val?></textarea>
+                                    <br>
+<pre style="padding:5px;background:#ffffff;font-size:11px;line-height: 12px;text-align:left;"><?=Loc::getMessage('AWZ_COOKIESSETT_OPT_DSBL_REJ_DESC')?></pre>
                                 </td>
                             </tr>
 
@@ -275,37 +308,59 @@ $APPLICATION->IncludeComponent("awz:cookies.sett",".default",
                             <tr class="awz_cookies_sett__admin-<?=$arSite['LID']?>">
                                 <td style="width:20%;"><?=Loc::getMessage('AWZ_COOKIES_SETT_PARAM_LINK')?></td>
                                 <td>
-                                    <input class="awz--load-html-js" type="text" value="<?=$valParams['LINK']?>" name="PARAMS[<?=$arSite['LID']?>][LINK]">
+                                    <input size="38" class="awz--load-html-js" type="text" value="<?=$valParams['LINK']?>" name="PARAMS[<?=$arSite['LID']?>][LINK]">
                                 </td>
                             </tr>
                             <tr class="awz_cookies_sett__admin-<?=$arSite['LID']?>">
                                 <td style="width:20%;"><?=Loc::getMessage('AWZ_COOKIES_SETT_PARAM_LINK_ANCOR')?></td>
                                 <td>
-                                    <input class="awz--load-html-js" type="text" value="<?=$valParams['LINK_ANCOR']?>" name="PARAMS[<?=$arSite['LID']?>][LINK_ANCOR]">
+                                    <input size="38" class="awz--load-html-js" type="text" value="<?=$valParams['LINK_ANCOR']?>" name="PARAMS[<?=$arSite['LID']?>][LINK_ANCOR]">
                                 </td>
                             </tr>
                             <tr class="awz_cookies_sett__admin-<?=$arSite['LID']?>">
                                 <td style="width:20%;"><?=Loc::getMessage('AWZ_COOKIES_SETT_PARAM_BUTTON_OK')?></td>
                                 <td>
-                                    <input class="awz--load-html-js" type="text" value="<?=$valParams['BUTTON_OK']?>" name="PARAMS[<?=$arSite['LID']?>][BUTTON_OK]">
+                                    <input size="38" class="awz--load-html-js" type="text" value="<?=$valParams['BUTTON_OK']?>" name="PARAMS[<?=$arSite['LID']?>][BUTTON_OK]">
                                 </td>
                             </tr>
                             <tr class="awz_cookies_sett__admin-<?=$arSite['LID']?>">
                                 <td style="width:20%;"><?=Loc::getMessage('AWZ_COOKIES_SETT_PARAM_BUTTON_NO')?></td>
                                 <td>
-                                    <input class="awz--load-html-js" type="text" value="<?=$valParams['BUTTON_NO']?>" name="PARAMS[<?=$arSite['LID']?>][BUTTON_NO]">
+                                    <input size="38" class="awz--load-html-js" type="text" value="<?=$valParams['BUTTON_NO']?>" name="PARAMS[<?=$arSite['LID']?>][BUTTON_NO]">
                                 </td>
                             </tr>
                             <tr class="awz_cookies_sett__admin-<?=$arSite['LID']?>">
                                 <td style="width:20%;"><?=Loc::getMessage('AWZ_COOKIES_SETT_PARAM_BUTTON_SETT')?></td>
                                 <td>
-                                    <input class="awz--load-html-js" type="text" value="<?=$valParams['BUTTON_SETT']?>" name="PARAMS[<?=$arSite['LID']?>][BUTTON_SETT]">
+                                    <input size="38" class="awz--load-html-js" type="text" value="<?=$valParams['BUTTON_SETT']?>" name="PARAMS[<?=$arSite['LID']?>][BUTTON_SETT]">
                                 </td>
                             </tr>
                             <tr class="awz_cookies_sett__admin-<?=$arSite['LID']?>">
                                 <td style="width:20%;"><?=Loc::getMessage('AWZ_COOKIES_SETT_PARAM_MSG')?></td>
                                 <td>
                                     <textarea class="awz--load-html-js" cols="40" rows="4" name="PARAMS[<?=$arSite['LID']?>][MSG]"><?=trim($valParams['MSG'])?></textarea>
+                                </td>
+                            </tr>
+                            <?
+                            $activeVariants = [
+                                'BOTTOM_RIGHT',
+                                'BOTTOM_LEFT',
+                                'BOTTOM_CENTER',
+                                'TOP_RIGHT',
+                                'TOP_LEFT',
+                                'TOP_CENTER'
+                            ];
+                            ?>
+                            <tr class="awz_cookies_sett__admin-<?=$arSite['LID']?>">
+                                <td style="width:20%;"><?=Loc::getMessage('AWZ_COOKIES_SETT_PARAM_FLOAT')?></td>
+                                <td>
+                                    <select class="awz--load-html-js" type="select" name="PARAMS[<?=$arSite['LID']?>][FLOAT]">
+                                        <?foreach($activeVariants as $type_k){?>
+                                            <option value="<?=$type_k?>"<?if($type_k==$valParams['FLOAT']){?> selected="selected"<?}?>>
+                                                <?=Loc::getMessage('AWZ_COOKIES_SETT_PARAM_FLOAT_'.$type_k)?>
+                                            </option>
+                                        <?}?>
+                                    </select>
                                 </td>
                             </tr>
                         </table>

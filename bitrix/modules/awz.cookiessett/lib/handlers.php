@@ -25,12 +25,39 @@ class Handlers {
     }
 
     public static function OnEndBufferContent(&$content){
-        $context = Application::getInstance()->getContext();
-        if($context->getRequest()->isAdminSection()) return;
+        $request = Application::getInstance()->getContext()->getRequest();
+        if($request->isAdminSection()) return;
+        if($request->isPost()) return;
+        if($request->isAjaxRequest()) return;
+
+        $dsbl_get = explode(", ", Option::get("awz.cookiessett", 'DSBL_GET', '', SITE_ID));
+
+        if(!empty($dsbl_get)){
+            foreach($dsbl_get as $prm){
+                $key_get = trim($prm);
+                if($key_get && $request->get($key_get))
+                    return;
+            }
+        }
+
         if(
             Option::get("awz.cookiessett", 'SHOW', 'N', SITE_ID)==="Y" &&
             mb_strpos(mb_substr($content,-20), '</body>')!==false
         ){
+            $curPage = $request->getRequestUri();
+            if ($arExcluded = explode("\n", Option::get("awz.cookiessett", 'DSBL_REJ', '', SITE_ID))) {
+                foreach ($arExcluded as $exc) {
+                    if(!trim($exc) || strlen(trim($exc))<3) continue;
+                    try{
+                        if (preg_match($exc, $curPage)) {
+                            return;
+                        }
+                    }catch (\Exception $e){
+
+                    }
+                }
+            }
+
             global $APPLICATION;
             ob_start();
             $strParams = Option::get("awz.cookiessett", 'PARAMS', '', SITE_ID);

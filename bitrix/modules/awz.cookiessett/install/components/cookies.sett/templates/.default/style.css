@@ -1,11 +1,35 @@
-
 .awz_cookies_sett__message {display: block;position: fixed;z-index: 1049;
-    width:45%;max-width:580px;
-    right:10px;bottom:10px;
+    width:60%;max-width:580px;
+    right:auto;left:auto;bottom:auto;top:auto;
     font-size:0.8em;line-height:1.3em;border-radius:10px;
 }
+.awz_cookies_sett__message_bottom_right, .awz_cookies_sett__message_ {
+    right:10px;bottom:10px;
+}
+.awz_cookies_sett__message_bottom_left {
+    left:10px;bottom:10px;
+}
+.awz_cookies_sett__message_top_left {
+    left:10px;top:10px;
+}
+.awz_cookies_sett__message_top_right {
+    right:10px;top:10px;
+}
+.awz_cookies_sett__message_bottom_center, .awz_cookies_sett__message_top_center {
+    left:50%;
+    margin-left:-290px;
+}
+@media (max-width: 1102px) {
+    .awz_cookies_sett__message_bottom_center, .awz_cookies_sett__message_top_center {
+        left:20%;
+        margin-left:0;
+    }
+}
+.awz_cookies_sett__message_bottom_center {bottom:10px;}
+.awz_cookies_sett__message_top_center {top:10px;}
 .awz_cookies_sett__admin .awz_cookies_sett__message {position: static;width:100%;
-font-size: 1em;line-height:1.3em;
+    max-width:580px;
+    font-size: 1em;line-height:1.3em;margin:0;
 }
 .awz_cookies_sett__container {display:block;padding:0.8em 1.5em;}
 .awz_cookies_sett__btn {padding:0.4em 0.8em;margin:0.3em;display:inline-block;
@@ -27,7 +51,7 @@ font-size: 1em;line-height:1.3em;
 .awz_cookies_sett__detail-checkbox-text {display:block;position:relative;margin-bottom:0.5em;}
 .awz_cookies_sett__detail-title {font-weight:bold;padding:3px 0;display:block;}
 .awz_cookies_sett__save, .awz_cookies_sett__save:hover {background:red;color:#ffffff;padding:0.6em 1.5em;text-decoration:none;
-display:inline-block;
+    display:inline-block;
     margin-top:1em;
     border:none;
     outline: none;
@@ -198,11 +222,14 @@ a.awz_cookies_sett__color2:hover {color:#ffe40e;}
 @media (max-width: 767.98px) {
     .awz_cookies_sett__message{
         width:100%;
-        right:0;
-        bottom:0;
+        max-width: 768px;
         border-radius:0px;
         text-align: center;
     }
+    .awz_cookies_sett__message_bottom_right, .awz_cookies_sett__message_{right:0;bottom:0;}
+    .awz_cookies_sett__message_bottom_left, .awz_cookies_sett__message_bottom_center {left:0;bottom:0;}
+    .awz_cookies_sett__message_top_left, .awz_cookies_sett__message_top_center {left:0;top:0;}
+    .awz_cookies_sett__message_top_right {right:0;top:0;}
     .awz_cookies_sett__message br {display:none;}
     .awz_cookies_sett__row {flex-direction: column;}
     .awz_cookies_sett__col__right {padding-top:0.3em;}

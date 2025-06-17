@@ -5,7 +5,7 @@ if (!defined("B_PROLOG_INCLUDED") || B_PROLOG_INCLUDED !== true)
 }
 use Bitrix\Main\Application;
 ?>
-<div class="awz_cookies_sett__message awz_cookies_sett__bg1 awz_cookies_sett__color2">
+<div class="awz_cookies_sett__message awz_cookies_sett__message_<?=mb_strtolower($arParams['FLOAT'])?> awz_cookies_sett__bg1 awz_cookies_sett__color2">
     <div class="awz_cookies_sett__container">
         <div class="awz_cookies_sett__row">
             <div class="awz_cookies_sett__col" id="awz_cookies_sett__msg">
