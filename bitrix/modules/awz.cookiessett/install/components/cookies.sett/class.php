@@ -111,7 +111,7 @@ class AwzCookiesSettComponent extends CBitrixComponent implements Controllerable
      *
      * @throws LoaderException
      */
-    public function executeComponent(): void
+    public function executeComponent()
     {
         if(!$this->isRequiredModule())
         {
@@ -213,7 +213,7 @@ class AwzCookiesSettComponent extends CBitrixComponent implements Controllerable
      * @param string|int $code Code of error.
      * @return Error|null
      */
-    public function getErrorByCode($code): ?Error
+    public function getErrorByCode($code)
     {
         return $this->errorCollection->getErrorByCode($code);
     }

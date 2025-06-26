@@ -43,11 +43,12 @@ class App {
      */
     const ACCEPT_ALL = 31;
 
-    protected string $siteId;
+    /* не указывать типы поддержка php 7.0*/
+    protected $siteId;
 
-    private int $user_perm;
-    private bool $isEmpty;
-    private static array $_instances = [];
+    private $user_perm;
+    private $isEmpty;
+    private static $_instances = [];
 
     /**
      * @param string $siteId
@@ -58,9 +59,15 @@ class App {
         $this->user_perm = 0;
         $this->siteId = $siteId;
         $request = Application::getInstance()->getContext()->getRequest();
-        $session = Application::getInstance()->getSession();
         $cookieMask = $request->getCookie(self::SESSION_KEY.'_'.$this->siteId);
-        if(!$cookieMask) $cookieMask = $session->get(self::SESSION_KEY.'_'.$this->siteId);
+        if(!$cookieMask){
+            if(method_exists(Application::getInstance(),'getSession')){
+                $session = Application::getInstance()->getSession();
+                $cookieMask = $session->get(self::SESSION_KEY.'_'.$this->siteId);
+            }else{
+                $cookieMask = $_SESSION[self::SESSION_KEY.'_'.$this->siteId];
+            }
+        }
         if($cookieMask) $this->isEmpty = false;
         $this->set($cookieMask);
     }
@@ -142,8 +149,12 @@ class App {
 
     public function save(){
         $context = Application::getInstance()->getContext();
-        $session = Application::getInstance()->getSession();
-        $session->set(self::SESSION_KEY.'_'.$this->siteId, $this->get());
+        if(method_exists(Application::getInstance(),'getSession')){
+            $session = Application::getInstance()->getSession();
+            $session->set(self::SESSION_KEY.'_'.$this->siteId, $this->get());
+        }else{
+            $_SESSION[self::SESSION_KEY.'_'.$this->siteId] = $this->get();
+        }
         if($this->check(self::USER_REQUIRE)){
             $context->getResponse()->allowPersistentCookies(true);
             $cookie = new Cookie(self::SESSION_KEY.'_'.$this->siteId, $this->get());
