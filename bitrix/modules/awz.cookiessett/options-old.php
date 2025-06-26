@@ -164,7 +164,7 @@ $APPLICATION->IncludeComponent("awz:cookies.sett",".default",
                             $styleFile = new \Bitrix\Main\IO\File($_SERVER['DOCUMENT_ROOT'].'/bitrix/components/awz/cookies.sett/templates/.default/style.css');
                             ?>
                             <?if($styleFile->isExists()){
-                                \CJSCore::init(['jquery3','color_picker']);
+                                \CJSCore::init(['jquery','color_picker']);
                                 ?>
                                 <tr class="awz_cookies_sett__admin-<?=$arSite['LID']?>">
                                     <td style="width:20%;"></td>
