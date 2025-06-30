@@ -30,7 +30,7 @@ class Handlers {
         if($request->isPost()) return;
         if($request->isAjaxRequest()) return;
 
-        $dsbl_get = explode(", ", Option::get("awz.cookiessett", 'DSBL_GET', '', SITE_ID));
+        $dsbl_get = explode(",", Option::get("awz.cookiessett", 'DSBL_GET', '', SITE_ID));
 
         if(!empty($dsbl_get)){
             foreach($dsbl_get as $prm){
