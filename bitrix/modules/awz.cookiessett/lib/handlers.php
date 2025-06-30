@@ -77,7 +77,9 @@ class Handlers {
             $html = preg_replace("/\s?([:;{>}=])\s?/is","$1", $html);
 
             ob_end_clean();
-            $content = str_replace('</body>',$html."\n".'</body>',$content);
+            $contentAr = explode('</body>',$content);
+            $contentAr[count($contentAr)-2] .= "\n".$html."\n";
+            $content = implode('</body>',$contentAr);
         }
     }
 
