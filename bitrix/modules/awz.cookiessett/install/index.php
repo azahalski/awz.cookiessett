@@ -19,10 +19,6 @@ class awz_cookiessett extends CModule
         $arModuleVersion = array();
         include(__DIR__.'/version.php');
 
-        $dirs = explode('/',dirname(__DIR__ . '../'));
-        $this->MODULE_ID = array_pop($dirs);
-        unset($dirs);
-
         $this->MODULE_VERSION = $arModuleVersion["VERSION"];
         $this->MODULE_VERSION_DATE = $arModuleVersion["VERSION_DATE"];
 
@@ -46,10 +42,10 @@ class awz_cookiessett extends CModule
 
         ModuleManager::RegisterModule($this->MODULE_ID);
 
-        $filePath = dirname(__DIR__ . '/../../options.php');
-        if(file_exists($filePath)){
-            LocalRedirect('/bitrix/admin/settings.php?lang='.LANG.'&mid='.$this->MODULE_ID.'&mid_menu=1');
-        }
+        $APPLICATION->IncludeAdminFile(
+            Loc::getMessage("AWZ_COOKIESSETT_MODULE_NAME"),
+            $_SERVER['DOCUMENT_ROOT'].'/bitrix/modules/'. $this->MODULE_ID .'/install/solution.php'
+        );
 
         return true;
     }
@@ -59,11 +55,13 @@ class awz_cookiessett extends CModule
         global $APPLICATION, $step;
 
         $step = intval($step);
-        if($step < 2) { //выводим предупреждение
-            $APPLICATION->IncludeAdminFile(Loc::getMessage('AWZ_COOKIESSETT_INSTALL_TITLE'), $_SERVER['DOCUMENT_ROOT'].'/bitrix/modules/'. $this->MODULE_ID .'/install/unstep.php');
+        if($step < 2) {
+            $APPLICATION->IncludeAdminFile(
+                Loc::getMessage('AWZ_COOKIESSETT_INSTALL_TITLE'),
+                $_SERVER['DOCUMENT_ROOT'].'/bitrix/modules/'. $this->MODULE_ID .'/install/unstep.php'
+            );
         }
         elseif($step == 2) {
-            //проверяем условие
             if($_REQUEST['save'] != 'Y' && !isset($_REQUEST['save'])) {
                 $this->UnInstallDB();
             }
@@ -71,8 +69,11 @@ class awz_cookiessett extends CModule
             $this->UnInstallEvents();
             $this->deleteAgents();
 
-            ModuleManager::UnRegisterModule($this->MODULE_ID);
+            if($_REQUEST['saveopts'] != 'Y' && !isset($_REQUEST['saveopts'])) {
+                \Bitrix\Main\Config\Option::delete($this->MODULE_ID);
+            }
 
+            ModuleManager::UnRegisterModule($this->MODULE_ID);
             return true;
         }
     }
@@ -177,6 +178,7 @@ class awz_cookiessett extends CModule
     }
 
     function deleteAgents() {
+        CAgent::RemoveModuleAgents("sale");
         return true;
     }
 
