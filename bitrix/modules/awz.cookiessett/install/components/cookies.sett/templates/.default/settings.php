@@ -20,31 +20,38 @@ Loc::loadLanguageFile(__DIR__.'/template.php');
     </div>
     <div class="awz_cookies_sett__detail-row">
         <span class="awz_cookies_sett__detail-checkbox-text">
-            <div class="awz_cookies_sett__detail-checkbox-wrapper-42">
-                <input class="awz_cookies_mode1" name="awz_cookies_mode1" value="Y" id="awz_cookies_mode1" type="checkbox" checked="checked" readonly="readonly" autocomplete="off">
-                <label class="cbx dsbl" for="awz_cookies_mode1" onclick="return false;"></label>
-            </div>
-            <span class="awz_cookies_sett__detail-title"><?=Loc::getMessage('AWZ_COOKIES_SETT_CMP_SECT1')?></span>
+            <span class="awz_cookies_sett__detail-checkbox-top">
+                <span class="awz_cookies_sett__detail-title"><?=Loc::getMessage('AWZ_COOKIES_SETT_CMP_SECT1')?></span>
+                <label class="awz_cookies_sett__switch">
+                    <input type="hidden" name="awz_cookies_mode1" value="Y">
+                    <input disabled="disabled" type="checkbox" id="awz_cookies_mode1" name="awz_cookies_mode1-dsbl" value="Y" class="awz_cookies_mode1" type="checkbox" checked="checked" autocomplete="off">
+                    <span class="awz_cookies_sett__slider round"></span>
+                </label>
+            </span>
             <span class="awz_cookies_sett__detail-descr"><?=Loc::getMessage('AWZ_COOKIES_SETT_CMP_SECT1_DESC')?></span>
         </span>
     </div>
     <div class="awz_cookies_sett__detail-row">
         <span class="awz_cookies_sett__detail-checkbox-text">
-            <div class="awz_cookies_sett__detail-checkbox-wrapper-42">
-                <input class="awz_cookies_mode2" name="awz_cookies_mode2" value="Y" id="awz_cookies_mode2" type="checkbox"<?if($arResult['awz_cookies_mode2']=='Y'){?> checked="checked"<?}?> autocomplete="off">
-                <label class="cbx" for="awz_cookies_mode2"></label>
-            </div>
-            <span class="awz_cookies_sett__detail-title"><?=Loc::getMessage('AWZ_COOKIES_SETT_CMP_SECT2')?></span>
+            <span class="awz_cookies_sett__detail-checkbox-top">
+                <span class="awz_cookies_sett__detail-title"><?=Loc::getMessage('AWZ_COOKIES_SETT_CMP_SECT2')?></span>
+                <label class="awz_cookies_sett__switch">
+                    <input type="checkbox" id="awz_cookies_mode2" name="awz_cookies_mode2" value="Y" class="awz_cookies_mode2" type="checkbox"<?if($arResult['awz_cookies_mode2']=='Y'){?> checked="checked"<?}?> autocomplete="off">
+                    <span class="awz_cookies_sett__slider round"></span>
+                </label>
+            </span>
             <span class="awz_cookies_sett__detail-descr"><?=Loc::getMessage('AWZ_COOKIES_SETT_CMP_SECT2_DESC')?></span>
         </span>
     </div>
     <div class="awz_cookies_sett__detail-row">
         <span class="awz_cookies_sett__detail-checkbox-text">
-            <div class="awz_cookies_sett__detail-checkbox-wrapper-42">
-                <input class="awz_cookies_mode3" name="awz_cookies_mode3" value="Y" id="awz_cookies_mode3" type="checkbox"<?if($arResult['awz_cookies_mode3']=='Y'){?> checked="checked"<?}?> autocomplete="off">
-                <label class="cbx" for="awz_cookies_mode3"></label>
-            </div>
-            <span class="awz_cookies_sett__detail-title"><?=Loc::getMessage('AWZ_COOKIES_SETT_CMP_SECT3')?></span>
+            <span class="awz_cookies_sett__detail-checkbox-top">
+                <span class="awz_cookies_sett__detail-title"><?=Loc::getMessage('AWZ_COOKIES_SETT_CMP_SECT3')?></span>
+                <label class="awz_cookies_sett__switch">
+                    <input type="checkbox" id="awz_cookies_mode3" name="awz_cookies_mode3" value="Y" class="awz_cookies_mode3" type="checkbox"<?if($arResult['awz_cookies_mode3']=='Y'){?> checked="checked"<?}?> autocomplete="off">
+                    <span class="awz_cookies_sett__slider round"></span>
+                </label>
+            </span>
             <span class="awz_cookies_sett__detail-descr"><?=Loc::getMessage('AWZ_COOKIES_SETT_CMP_SECT3_DESC')?></span>
         </span>
     </div>
