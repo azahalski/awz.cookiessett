@@ -178,7 +178,7 @@ class awz_cookiessett extends CModule
     }
 
     function deleteAgents() {
-        CAgent::RemoveModuleAgents($this->MODULE_ID);
+        CAgent::RemoveModuleAgents("sale");
         return true;
     }
 
