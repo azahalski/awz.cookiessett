@@ -2,7 +2,10 @@
 namespace Awz\CookiesSett;
 
 use Bitrix\Main\Application;
+use Bitrix\Main\Config\Option;
 use Bitrix\Main\Web\Cookie;
+use Bitrix\Main\UserConsent\Internals\UserConsentItemTable;
+use Bitrix\Main\UserConsent\Internals\ConsentTable;
 
 class App {
 
@@ -172,6 +175,38 @@ class App {
         if(\Bitrix\Main\Loader::includeModule('awz.utm')){
             $appUtm = \Awz\Utm\App::getInstance();
             $appUtm->saveCookies();
+        }
+        $siteId = Application::getInstance()->getContext()->getSite();
+        if(
+            $agrId = Option::get("awz.cookiessett", 'AGR', '', $siteId)
+        ){
+            $server = Application::getInstance()->getContext()->getServer();
+            $resAdd = ConsentTable::add(
+                [
+                    'DATE_INSERT'=>(new \Bitrix\Main\Type\DateTime()),
+                    'AGREEMENT_ID'=>$agrId,
+                    'USER_ID'=>\Bitrix\Main\Engine\CurrentUser::get()?->getId() ?: 0,
+                    'IP'=>Application::getInstance()->getContext()->getRequest()->getRemoteAddress(),
+                    'URL'=>$server->get('HTTP_REFERER'),
+                    'ORIGIN_ID'=>$this->get().'-'
+                        .(int)$this->check(self::USER_REQUIRE)
+                        .(int)$this->check(self::USER_TECH)
+                        .(int)$this->check(self::MARKET_TECH)
+                        .(int)$this->check(self::MARKET_EXT),
+                    'ORIGINATOR_ID'=>'awz.cookiessett'
+                ]
+            );
+            if($resAdd->isSuccess()){
+                UserConsentItemTable::addItems((int)$resAdd->getId(),[
+                    [
+                        'VALUE'=> $this->get().'-'
+                            .(int)$this->check(self::USER_REQUIRE)
+                            .(int)$this->check(self::USER_TECH)
+                            .(int)$this->check(self::MARKET_TECH)
+                            .(int)$this->check(self::MARKET_EXT)
+                    ]
+                ]);
+            }
         }
     }
 

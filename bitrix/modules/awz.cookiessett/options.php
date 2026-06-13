@@ -18,6 +18,10 @@ Loc::loadMessages($_SERVER['DOCUMENT_ROOT'].'/bitrix/components/awz/cookies.sett
 global $APPLICATION;
 $module_id = "awz.cookiessett";
 if(!Loader::includeModule($module_id)) return;
+if(Loader::includeModule("awz.site")){
+    $awzModulePath = $_SERVER['DOCUMENT_ROOT'].'/bitrix/modules/awz.site/include/'.$module_id.'.php';
+    //if(file_exists($awzModulePath)) require_once($awzModulePath);
+}
 Extension::load('ui.sidepanel-content');
 $request = Application::getInstance()->getContext()->getRequest();
 $APPLICATION->SetTitle(Loc::getMessage('AWZ_COOKIESSETT_OPT_TITLE'));
@@ -41,6 +45,8 @@ if ($request->getRequestMethod()==='POST' && AccessController::isEditSettings() 
 {
     $shows = $request->get('SHOW');
     if(!is_array($shows)) $shows = [];
+    $agrs = $request->get('AGR');
+    if(!is_array($agrs)) $agrs = [];
     $DSBL_GET = $request->get('DSBL_GET');
     if(!is_array($DSBL_GET)) $DSBL_GET = [];
     $DSBL_REJ = $request->get('DSBL_REJ');
@@ -53,6 +59,7 @@ if ($request->getRequestMethod()==='POST' && AccessController::isEditSettings() 
             $shows[$arSite['LID']] = 'N';
         }
         Option::set($module_id, 'SHOW', $shows[$arSite['LID']], $arSite['LID']);
+        Option::set($module_id, 'AGR', $agrs[$arSite['LID']], $arSite['LID']);
         Option::set($module_id, 'DSBL_GET', $DSBL_GET[$arSite['LID']], $arSite['LID']);
         Option::set($module_id, 'DSBL_REJ', $DSBL_REJ[$arSite['LID']], $arSite['LID']);
         Option::set($module_id, 'PARAMS', serialize($PARAMS[$arSite['LID']]), $arSite['LID']);
@@ -162,6 +169,27 @@ $APPLICATION->IncludeComponent("awz:cookies.sett",".default",
                                 <td>
                                     <?$val = Option::get($module_id, "SHOW", "N",$arSite['LID']);?>
                                     <input type="checkbox" value="Y" name="SHOW[<?=$arSite['LID']?>]" <?if ($val=="Y") echo "checked";?>>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td style="width:20%;"><?=Loc::getMessage('AWZ_COOKIESSETT_OPT_AGR')?></td>
+                                <td>
+                                    <?$val = Option::get($module_id, "AGR", "",$arSite['LID']);?>
+                                    <select name="AGR[<?=$arSite['LID']?>]">
+                                        <option><?=Loc::getMessage('AWZ_COOKIESSETT_OPT_AGR_CHANGE')?></option>
+                                    <?
+                                    $agrRes = \Bitrix\Main\UserConsent\Internals\AgreementTable::getList(
+                                            ['select'=>['ID','NAME'],'order'=>['ID'=>'ASC']]
+                                    );
+                                    while($data = $agrRes->fetch()){
+                                        ?>
+                                        <option value="<?=$data['ID']?>"<?if($data['ID']==$val){?> selected="selected"<?}?>>
+                                            [<?=$data['ID']?>] <?=$data['NAME']?>
+                                        </option>
+                                        <?
+                                    }
+                                    ?>
+                                    </select>
                                 </td>
                             </tr>
                             <tr>

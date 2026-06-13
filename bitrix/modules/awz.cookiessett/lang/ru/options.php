@@ -4,6 +4,8 @@ $MESS["AWZ_COOKIESSETT_OPT_SECT1"] = "Настройки модуля";
 $MESS["AWZ_COOKIESSETT_OPT_SECT2"] = "Права доступа";
 $MESS["AWZ_COOKIESSETT_OPT_SHOW_DESC"] = "Вы можете самостоятельно разместить компонент перед закрывающим тегом BODY вашего шаблона (<b>Рекомендуется!</b> - <a target=\"_blank\" href=\"https://zahalski.dev/modules/awz.cookiessett/docs/\">для разработчиков</a>).<br>Или отметить публикацию компонента на обработчике (опция ниже).";
 $MESS["AWZ_COOKIESSETT_OPT_SHOW"] = "Публиковать компонент (обработчик onEndBufferContent)";
+$MESS["AWZ_COOKIESSETT_OPT_AGR"] = "<a href=\"/bitrix/admin/agreement_admin.php?lang=ru\">Соглашение</a> в которое публиковать журнал согласий";
+$MESS["AWZ_COOKIESSETT_OPT_AGR_CHANGE"] = "Выберите соглашение";
 $MESS["AWZ_COOKIESSETT_OPT_DSBL_GET"] = "Отключить компонент на страницах с get параметрами (через запятую)";
 $MESS["AWZ_COOKIESSETT_OPT_DSBL_REJ"] = "Отключить компонент на страницах по регулярному выражению (новое в новой строке)";
 $MESS["AWZ_COOKIESSETT_OPT_DSBL_REJ_DESC"] = "//if (preg_match(\$exc, \$curPage))<br><br>Пример точного пути: /catalog/<br>Опубликуется на странице /catalog/index.php<br><br>Пример регулярного выражения: #\/catalog\/*#i<br>Не опубликуется на странице */catalog/*<br>* - любой символ в любом количестве";

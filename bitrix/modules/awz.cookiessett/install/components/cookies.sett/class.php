@@ -122,12 +122,14 @@ class AwzCookiesSettComponent extends CBitrixComponent implements Controllerable
         $this->arResult['SHOW_MESSAGE'] = $app->isEmpty() ? 'Y' : 'N';
 
         if($app->isEmpty()){
-            $this->arResult['awz_cookies_mode2'] = 'Y';
-            $this->arResult['awz_cookies_mode3'] = 'Y';
+            $this->arResult['awz_cookies_mode2'] = $this->arParams['DEF_MODE_2'] ?? 'Y';
+            $this->arResult['awz_cookies_mode3'] = $this->arParams['DEF_MODE_3'] ?? 'Y';
+            $this->arResult['awz_cookies_mode4'] = $this->arParams['DEF_MODE_4'] ?? 'Y';
         }else{
             $this->arResult['awz_cookies_mode1'] = $app->check(CookieApp::USER_REQUIRE) ? 'Y' : 'N';
             $this->arResult['awz_cookies_mode2'] = $app->check(CookieApp::USER_TECH) ? 'Y' : 'N';
             $this->arResult['awz_cookies_mode3'] = $app->check(CookieApp::MARKET_EXT) ? 'Y' : 'N';
+            $this->arResult['awz_cookies_mode4'] = $app->check(CookieApp::MARKET_TECH) ? 'Y' : 'N';
         }
 
         if($this->arParams['TEMPLATE_FILE']){
@@ -154,6 +156,9 @@ class AwzCookiesSettComponent extends CBitrixComponent implements Controllerable
             }
             if($request->get('awz_cookies_mode3')=='Y'){
                 $app->add(CookieApp::MARKET_EXT);
+            }
+            if($request->get('awz_cookies_mode4')=='Y'){
+                $app->add(CookieApp::MARKET_TECH);
             }
         }
 

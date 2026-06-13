@@ -93,6 +93,7 @@
         settings: function(){
             let parent = this;
             let formData = {};
+            formData['SITE_ID'] = parent.siteId;
             formData['signedParameters'] = parent.signedParameters;
             formData['method'] = 'POST';
             formData['componentName'] = parent.componentName;
@@ -130,6 +131,7 @@
             };
             formData['signedParameters'] = this.signedParameters;
             formData['method'] = 'POST';
+            formData['SITE_ID'] = this.siteId;
             let elements = document.getElementsByClassName("awz_cookies_sett__message");
             if(elements && elements.length){
                 elements[0].remove();
@@ -150,6 +152,7 @@
             };
             formData['signedParameters'] = this.signedParameters;
             formData['method'] = 'POST';
+            formData['SITE_ID'] = this.siteId;
             document.getElementsByClassName("awz_cookies_sett__message")[0].remove();
             setTimeout(function(){
                 BX.ajax.runComponentAction('awz:cookies.sett', 'allow', {
@@ -165,6 +168,7 @@
             );
             formData.append('signedParameters', this.signedParameters);
             formData.append('method', 'POST');
+            formData.append('SITE_ID', this.siteId);
 
             this.getModal().close();
 
