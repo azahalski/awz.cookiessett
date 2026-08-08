@@ -7,9 +7,9 @@
     "status": "needs_review",
     "last_run_id": "awz.cookiessett-1786213260",
     "archive_sha256": null,
-    "open_findings": 3,
+    "open_findings": 2,
     "blocking_findings_open": 0,
-    "false_positive_findings": 1,
+    "false_positive_findings": 2,
     "accepted_risk_findings": 0,
     "fixed_findings": 0,
     "removed_findings": 0,
@@ -77,7 +77,7 @@
           "status": "false_positive",
           "note": "htmlspecialcharsBack существует внутри ядра битрикс",
           "author": "Andrew Zahalski",
-          "updated_at": "2026-08-08T18:27:15+00:00"
+          "updated_at": "2026-08-08T18:39:19+00:00"
         }
       },
       "events": [
@@ -95,6 +95,14 @@
           "run_id": "awz.cookiessett-1786213260",
           "event": "partner_disposition_updated",
           "at": "2026-08-08T18:27:15+00:00",
+          "status": "false_positive",
+          "note": "htmlspecialcharsBack существует внутри ядра битрикс",
+          "author": "Andrew Zahalski"
+        },
+        {
+          "run_id": "awz.cookiessett-1786213260",
+          "event": "partner_disposition_updated",
+          "at": "2026-08-08T18:39:19+00:00",
           "status": "false_positive",
           "note": "htmlspecialcharsBack существует внутри ядра битрикс",
           "author": "Andrew Zahalski"
@@ -157,6 +165,14 @@
           "status": "open",
           "note": "",
           "author": ""
+        },
+        {
+          "run_id": "awz.cookiessett-1786213260",
+          "event": "partner_disposition_updated",
+          "at": "2026-08-08T18:39:19+00:00",
+          "status": "open",
+          "note": "",
+          "author": ""
         }
       ]
     },
@@ -216,6 +232,14 @@
           "status": "open",
           "note": "",
           "author": ""
+        },
+        {
+          "run_id": "awz.cookiessett-1786213260",
+          "event": "partner_disposition_updated",
+          "at": "2026-08-08T18:39:19+00:00",
+          "status": "open",
+          "note": "",
+          "author": ""
         }
       ]
     },
@@ -224,7 +248,7 @@
       "fingerprint": "9784af858457a2831e444e084e691c66",
       "type": "Authentication Bypass",
       "severity": "medium",
-      "status": "open",
+      "status": "false_positive",
       "first_seen_run_id": "awz.cookiessett-1786213260",
       "last_seen_run_id": "awz.cookiessett-1786213260",
       "resolved_run_id": null,
@@ -255,6 +279,12 @@
           "action": "verify-on-latest-version",
           "confidence": "medium",
           "rationale": "Set to medium because the finding describes authorization bypass or privilege misuse, but not a direct high-impact IDOR, financial bug, or confirmed account takeover in the journal text."
+        },
+        "partner_disposition": {
+          "status": "false_positive",
+          "note": "метод публичный для неавторизованных",
+          "author": "Andrew Zahalski",
+          "updated_at": "2026-08-08T18:39:19+00:00"
         }
       },
       "events": [
@@ -275,6 +305,14 @@
           "status": "open",
           "note": "",
           "author": ""
+        },
+        {
+          "run_id": "awz.cookiessett-1786213260",
+          "event": "partner_disposition_updated",
+          "at": "2026-08-08T18:39:19+00:00",
+          "status": "false_positive",
+          "note": "метод публичный для неавторизованных",
+          "author": "Andrew Zahalski"
         }
       ]
     }

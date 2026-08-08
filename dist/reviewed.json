@@ -27,7 +27,7 @@
           "status": "false_positive",
           "note": "htmlspecialcharsBack существует внутри ядра битрикс",
           "author": "Andrew Zahalski",
-          "updated_at": "2026-08-08T18:27:15+00:00"
+          "updated_at": "2026-08-08T18:39:19+00:00"
         }
       },
       {
@@ -91,6 +91,12 @@
           "action": "verify-on-latest-version",
           "confidence": "medium",
           "rationale": "Set to medium because the finding describes authorization bypass or privilege misuse, but not a direct high-impact IDOR, financial bug, or confirmed account takeover in the journal text."
+        },
+        "partner_disposition": {
+          "status": "false_positive",
+          "note": "метод публичный для неавторизованных",
+          "author": "Andrew Zahalski",
+          "updated_at": "2026-08-08T18:39:19+00:00"
         }
       }
     ],
@@ -159,7 +165,7 @@
       ]
     },
     "feedbackSummary": {
-      "updatedAt": "2026-08-08T18:27:15+00:00",
+      "updatedAt": "2026-08-08T18:39:19+00:00",
       "applied": 4
     }
   }
