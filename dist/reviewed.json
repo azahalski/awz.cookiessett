@@ -1,16 +1,37 @@
 {
   "success": true,
-  "requestId": "awz.cookiessett-1786192094",
+  "requestId": "awz.cookiessett-1786219860",
   "data": {
     "vulnerabilities": [
       {
         "file": "lib/handlers.php",
         "line": "52",
-        "type": "Command Injection",
+        "type": "Regex Injection",
+        "severity": "high",
+        "description": "Confirmed Regex Injection via DSBL_REJ option. The DSBL_REJ option value is retrieved from database/Option storage and used directly in preg_match() without validation. An attacker who can control this option value can inject malicious regex patterns leading to ReDoS or arbitrary code execution.",
+        "recommendation": "Validate regex pattern before use with preg_match('/^.+$/s', $exc) or use a whitelist approach for URL exclusion.",
+        "fix": "Before:\nif (preg_match($exc, $curPage)) {\n    return;\n}\n\nAfter:\n// Validate regex pattern first\nif (@preg_match($exc, '') === false) {\n    continue;\n}\nif (preg_match($exc, $curPage)) {\n    return;\n}",
+        "reviewed": {
+          "oldSeverity": "high",
+          "newSeverity": "high",
+          "changed": false,
+          "category": "kept-as-reported",
+          "versionScope": "current",
+          "version": "current",
+          "currentVersionRelevance": "present-in-current-scan",
+          "action": "fix",
+          "confidence": "medium",
+          "rationale": "Severity left unchanged after review; no stronger Bitrix/BUS-specific downgrade condition was identified from the journal text alone."
+        }
+      },
+      {
+        "file": "lib/handlers.php",
+        "line": "64",
+        "type": "Insecure Deserialization",
         "severity": "medium",
-        "description": "Подтверждена уязвимость Regex Injection в хуке OnPageStart. Пользовательский паттерн регулярного выражения берётся из настроек модуля (Option::get('awz.cookiessett', 'DSBL_REJ')) и передаётся напрямую в preg_match() без экранирования на строке 52. Администратор может задать произвольный паттерн в настройках админ-панели (options.php:52-53, поле DSBL_REJ). На PHP < 7.0 это позволяет выполнить RCE через модификатор /e. На PHP >= 7.0 (модуль требует PHP >= 8.1, см. options.php:2) основной риск — ReDoS (Denial of Service) через катастрофический бэктрекинг, так как регулярное выражение выполняется на каждом запросе к сайту в хуке OnEndBufferContent, который срабатывает для каждой страницы.",
-        "recommendation": "Экранировать пользовательский ввод перед использованием в preg_match() через preg_quote(). Если требуется поддержка полных регулярных выражений в настройках — валидировать паттерн через preg_match('/^[^\\\\x00-\\\\x1f]+$/', $pattern) перед использованием и ограничить максимальную длину. Добавить таймаут выполнения регулярных выражений.",
-        "fix": "Before:\nif (preg_match($exc, $curPage)) {\n    return;\n}\n\nAfter:\ntry {\n    // Sanitize the pattern to prevent ReDoS and injection\n    $escapedPattern = preg_quote(trim($exc), '#');\n    if ($escapedPattern !== false && preg_match('#' . $escapedPattern . '#i', $curPage)) {\n        return;\n    }\n} catch (\\Exception $e) {\n    // Log error but continue processing\n}",
+        "description": "unserialize() is called on PARAMS option value. While allowed_classes is set to false, the deserialized data structure is not validated before being passed to component execution.",
+        "recommendation": "Add structural validation after deserialization to ensure expected array keys exist and contain expected types.",
+        "fix": "Before:\n$strArParams = unserialize($strParams, ['allowed_classes'=>false]);\n\nAfter:\n$strArParams = @unserialize($strParams, ['allowed_classes'=>false]);\nif (!is_array($strArParams)) {\n    $strArParams = ['COMPONENT_TEMPLATE'=>'.default'];\n}",
         "reviewed": {
           "oldSeverity": "medium",
           "newSeverity": "medium",
@@ -26,12 +47,54 @@
       },
       {
         "file": "lib/handlers.php",
-        "line": "16-18,64-66",
+        "line": "16",
+        "type": "Insecure Deserialization",
+        "severity": "medium",
+        "description": "unserialize() is called on PARAMS option value in OnPageStart handler. The data is used to check $strArParams['BUTTON_SETT'] without validation.",
+        "recommendation": "Add structural validation after deserialization.",
+        "fix": "Same as above.",
+        "reviewed": {
+          "oldSeverity": "medium",
+          "newSeverity": "medium",
+          "changed": false,
+          "category": "kept-as-reported",
+          "versionScope": "current",
+          "version": "current",
+          "currentVersionRelevance": "present-in-current-scan",
+          "action": "fix",
+          "confidence": "medium",
+          "rationale": "Severity left unchanged after review; no stronger Bitrix/BUS-specific downgrade condition was identified from the journal text alone."
+        }
+      },
+      {
+        "file": "options.php",
+        "line": "100",
+        "type": "Insecure Deserialization",
+        "severity": "medium",
+        "description": "unserialize() called on stored PARAMS option. Admin page requires proper permissions but stored data could be manipulated if database is compromised.",
+        "recommendation": "Add type checking after deserialization.",
+        "fix": "Same as above.",
+        "reviewed": {
+          "oldSeverity": "medium",
+          "newSeverity": "medium",
+          "changed": false,
+          "category": "kept-as-reported",
+          "versionScope": "current",
+          "version": "current",
+          "currentVersionRelevance": "present-in-current-scan",
+          "action": "fix",
+          "confidence": "medium",
+          "rationale": "Severity left unchanged after review; no stronger Bitrix/BUS-specific downgrade condition was identified from the journal text alone."
+        }
+      },
+      {
+        "file": "lib/app.php",
+        "line": "190",
         "type": "Information Disclosure",
         "severity": "low",
-        "description": "Подозрение: Insecure Deserialization в handlers.php (строки 16-18 и 64-66). Данные читаются из Option::get('awz.cookiessett', 'PARAMS') и передаются в unserialize() с ['allowed_classes'=>false]. Хотя allowed_classes=>false ограничивает instantiation произвольных классов, сериализованные данные могут содержать объектные метаданные, которые при некорректной обработке могут привести к непредвиденному поведению. Данный паттерн является defense-in-depth проблемой, так как источник данных — настройки модуля, доступные только администратору.",
-        "recommendation": "Использовать json_decode()/json_encode() вместо serialize()/unserialize() для хранения структурированных данных в опциях модуля. Это исключит риски, связанные с десериализацией PHP-объектов.",
-        "fix": "Before:\n$strParams = Option::get(\"awz.cookiessett\", 'PARAMS', '', SITE_ID);\n$strArParams = unserialize(\n    $strParams,\n    ['allowed_classes'=>false]\n);\n\nAfter:\n$strParams = Option::get(\"awz.cookiessett\", 'PARAMS', '', SITE_ID);\n$strArParams = json_decode($strParams, true);\nif (!is_array($strArParams)) {\n    $strArParams = [];\n}",
+        "description": "HTTP_REFERER header is stored directly in user consent record without sanitization. This could contain malicious data.",
+        "recommendation": "Validate and sanitize HTTP_REFERER before storing.",
+        "fix": "Before:\n'URL'=>$server->get('HTTP_REFERER'),\n\nAfter:\n$referer = $server->get('HTTP_REFERER');\n$referer = parse_url($referer, PHP_URL_HOST) ? $referer : '/';\n'URL'=>$referer,",
         "reviewed": {
           "oldSeverity": "low",
           "newSeverity": "low",
@@ -46,65 +109,70 @@
         }
       },
       {
-        "file": "options.php",
-        "line": "100,138-140",
-        "type": "Information Disclosure",
-        "severity": "low",
-        "description": "Подозрение: Insecure Deserialization в options.php (строки 100 и 138-140). Аналогично handlers.php — unserialize() с ['allowed_classes'=>false] для данных из Option. Источник — настройки модуля, доступные только авторизованным администраторам. riskLevel повышен до low из-за того, что код демонстрируется пользователям в textarea (options.php:96-108) как пример для копирования, что может привести к утечке внутренней логики модуля.",
-        "recommendation": "Заменить serialize()/unserialize() на json_encode()/json_decode(). Обновить пример кода в textarea (options.php:96-108) для использования JSON.",
-        "fix": "Before:\n$strArParams = unserialize($strParams,['allowed_classes'=>false]);\n...\n$valParams = unserialize(\n    Option::get($module_id, \"PARAMS\", \"N\",$arSite['LID']),\n    ['allowed_classes'=>false]\n);\n\nAfter:\n$strArParams = json_decode($strParams, true);\nif (!is_array($strArParams)) {\n    $strArParams = [];\n}\n...\n$valParams = json_decode(\n    Option::get($module_id, \"PARAMS\", \"N\",$arSite['LID']),\n    true\n);\nif (!is_array($valParams)) {\n    $valParams = [...];\n}",
+        "file": "install/index.php",
+        "line": "84",
+        "type": "SQL Injection",
+        "severity": "medium",
+        "description": "getConnection() is used and then RunSQLBatch() is called. SQL batch files should be reviewed for parameterized queries.",
+        "recommendation": "Review SQL batch files for proper parameterization.",
+        "fix": "Review install/db/mysql/install.sql and access.sql files for any dynamic SQL construction.",
         "reviewed": {
           "oldSeverity": "low",
-          "newSeverity": "low",
-          "changed": false,
-          "category": "kept-as-reported",
+          "newSeverity": "medium",
+          "changed": true,
+          "category": "sql-injection",
           "versionScope": "current",
           "version": "current",
           "currentVersionRelevance": "present-in-current-scan",
-          "action": "fix",
+          "action": "parameterize-query",
           "confidence": "medium",
-          "rationale": "Severity left unchanged after review; no stronger Bitrix/BUS-specific downgrade condition was identified from the journal text alone."
+          "rationale": "Kept as medium by default under the BUS Marketplace triage policy; raise only when exploit impact is proven beyond the journal text."
         }
       }
     ],
-    "summary": "Обнаружено 3 уязвимости в 2 файлах при анализе 61 файла модуля. Максимальная severity: medium. Основная уязвимость — Regex Injection в lib/handlers.php, позволяющая администратору задать произвольный паттерн регулярного выражения, который выполняется на каждой странице сайта. Также обнаружены 2 случая потенциальной Insecure Deserialization (defense-in-depth) с низким уровнем риска.",
+    "summary": "Found 6 vulnerabilities in 4 files out of 61 module files analyzed. Maximum severity: high. Main critical vulnerability - Regex Injection via DSBL_REJ option in lib/handlers.php:52, exploitable by users with access to module settings. Also found unsafe deserialization in handlers and options pages, potential information disclosure via HTTP_REFERER, and SQL connection patterns.",
     "scannedFiles": 61,
-    "riskLevel": "medium",
+    "riskLevel": "high",
     "auditedFiles": [
       "lib/handlers.php",
       "lib/app.php",
+      "options.php",
       "install/components/cookies.sett/class.php",
-      "lib/access/model/usermodel.php",
-      "options.php"
+      "install/components/cookiessett.config.permissions/ajax.php"
     ],
     "reviewSummary": {
       "reviewedAt": "2026-08-08",
       "method": "BUS-aware triage: preserve original finding fields except severity, add reviewed node with old severity and rationale.",
       "totals": {
-        "vulnerabilities": 3,
-        "changedSeverity": 0,
-        "unchangedSeverity": 3
+        "vulnerabilities": 6,
+        "changedSeverity": 1,
+        "unchangedSeverity": 5
       },
       "rawSeverityCounts": {
-        "medium": 1,
+        "high": 1,
+        "medium": 3,
         "low": 2
       },
       "reviewedSeverityCounts": {
-        "medium": 1,
-        "low": 2
+        "high": 1,
+        "medium": 4,
+        "low": 1
       },
       "currentScope": {
-        "total": 3,
+        "total": 6,
         "rawSeverityCounts": {
-          "medium": 1,
+          "high": 1,
+          "medium": 3,
           "low": 2
         },
         "reviewedSeverityCounts": {
-          "medium": 1,
-          "low": 2
+          "high": 1,
+          "medium": 4,
+          "low": 1
         },
         "reviewedCategories": {
-          "kept-as-reported": 3
+          "kept-as-reported": 5,
+          "sql-injection": 1
         }
       },
       "historicalUpdatePackages": {
