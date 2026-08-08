@@ -68,7 +68,12 @@ class Handlers {
 
                     try {
                         // @ подавляет Warning при ошибках синтаксиса
+                        $oldLimit = @ini_set('pcre.backtrack_limit', 100000);
                         $match = @preg_match($exc, $curPage);
+                        @ini_set('pcre.backtrack_limit', $oldLimit);
+                        if ($match === false) {
+                            continue;
+                        }
 
                         // Если вернулся false — регулярка некорректна, пропускаем её
                         if ($match === false) {

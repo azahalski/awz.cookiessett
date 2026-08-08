@@ -41,7 +41,7 @@ $siteRes = SiteTable::getList(['select'=>['LID','NAME'],'filter'=>['ACTIVE'=>'Y'
 $context = Application::getInstance()->getContext();
 $request = $context->getRequest();
 
-if ($request->getRequestMethod()==='POST' && AccessController::isEditSettings() && $request->get('Update'))
+if ($request->getRequestMethod()==='POST' && AccessController::isEditSettings() && $request->get('Update') && check_bitrix_sessid())
 {
     $shows = $request->get('SHOW');
     if(!is_array($shows)) $shows = [];
@@ -81,6 +81,7 @@ $tabControl->Begin();
 ?>
 <style>.adm-workarea option:checked {background-color: rgb(206, 206, 206);}</style>
 <form method="POST" action="<?=$saveUrl?>" id="FORMACTION">
+    <?=bitrix_sessid_post()?>
     <?
     $tabControl->BeginNextTab();
     Extension::load("ui.alerts");
