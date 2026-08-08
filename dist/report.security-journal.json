@@ -1,0 +1,193 @@
+{
+  "schema_version": "1.0",
+  "module": {
+    "code": "awz.cookiessett"
+  },
+  "current_state": {
+    "status": "needs_review",
+    "last_run_id": "awz.cookiessett-1786192094",
+    "archive_sha256": null,
+    "open_findings": 3,
+    "blocking_findings_open": 0,
+    "false_positive_findings": 0,
+    "accepted_risk_findings": 0,
+    "fixed_findings": 0,
+    "removed_findings": 0,
+    "total_findings": 3
+  },
+  "runs": [
+    {
+      "run_id": "awz.cookiessett-1786192094",
+      "created_at": "2026-08-08T12:29:13+00:00",
+      "archive_sha256": null,
+      "scanner_request_id": "awz.cookiessett-1786192094",
+      "input_summary": "Обнаружено 3 уязвимости в 2 файлах при анализе 61 файла модуля. Максимальная severity: medium. Основная уязвимость — Regex Injection в lib/handlers.php, позволяющая администратору задать произвольный паттерн регулярного выражения, который выполняется на каждой странице сайта. Также обнаружены 2 случая потенциальной Insecure Deserialization (defense-in-depth) с низким уровнем риска.",
+      "summary": {
+        "current_scan_findings": 3,
+        "severity_counts": {
+          "medium": 1,
+          "low": 2
+        },
+        "new_findings": 3,
+        "still_open_findings": 0,
+        "reopened_findings": 0,
+        "resolved_since_previous_run": 0
+      }
+    }
+  ],
+  "findings": [
+    {
+      "journal_finding_id": "JF-00001",
+      "fingerprint": "b18ecfc2b46549e0296b4a01bd1a1043",
+      "type": "Command Injection",
+      "severity": "medium",
+      "status": "open",
+      "first_seen_run_id": "awz.cookiessett-1786192094",
+      "last_seen_run_id": "awz.cookiessett-1786192094",
+      "resolved_run_id": null,
+      "original_location": {
+        "file": "lib/handlers.php",
+        "line": "52"
+      },
+      "current_location": {
+        "file": "lib/handlers.php",
+        "line": "52"
+      },
+      "latest_vulnerability": {
+        "file": "lib/handlers.php",
+        "line": "52",
+        "type": "Command Injection",
+        "severity": "medium",
+        "description": "Подтверждена уязвимость Regex Injection в хуке OnPageStart. Пользовательский паттерн регулярного выражения берётся из настроек модуля (Option::get('awz.cookiessett', 'DSBL_REJ')) и передаётся напрямую в preg_match() без экранирования на строке 52. Администратор может задать произвольный паттерн в настройках админ-панели (options.php:52-53, поле DSBL_REJ). На PHP < 7.0 это позволяет выполнить RCE через модификатор /e. На PHP >= 7.0 (модуль требует PHP >= 8.1, см. options.php:2) основной риск — ReDoS (Denial of Service) через катастрофический бэктрекинг, так как регулярное выражение выполняется на каждом запросе к сайту в хуке OnEndBufferContent, который срабатывает для каждой страницы.",
+        "recommendation": "Экранировать пользовательский ввод перед использованием в preg_match() через preg_quote(). Если требуется поддержка полных регулярных выражений в настройках — валидировать паттерн через preg_match('/^[^\\\\x00-\\\\x1f]+$/', $pattern) перед использованием и ограничить максимальную длину. Добавить таймаут выполнения регулярных выражений.",
+        "fix": "Before:\nif (preg_match($exc, $curPage)) {\n    return;\n}\n\nAfter:\ntry {\n    // Sanitize the pattern to prevent ReDoS and injection\n    $escapedPattern = preg_quote(trim($exc), '#');\n    if ($escapedPattern !== false && preg_match('#' . $escapedPattern . '#i', $curPage)) {\n        return;\n    }\n} catch (\\Exception $e) {\n    // Log error but continue processing\n}",
+        "reviewed": {
+          "oldSeverity": "medium",
+          "newSeverity": "medium",
+          "changed": false,
+          "category": "kept-as-reported",
+          "versionScope": "current",
+          "version": "current",
+          "currentVersionRelevance": "present-in-current-scan",
+          "action": "fix",
+          "confidence": "medium",
+          "rationale": "Severity left unchanged after review; no stronger Bitrix/BUS-specific downgrade condition was identified from the journal text alone."
+        }
+      },
+      "events": [
+        {
+          "run_id": "awz.cookiessett-1786192094",
+          "event": "detected",
+          "at": "2026-08-08T12:29:13+00:00",
+          "location": {
+            "file": "lib/handlers.php",
+            "line": "52"
+          },
+          "status": "open"
+        }
+      ]
+    },
+    {
+      "journal_finding_id": "JF-00002",
+      "fingerprint": "c2b708a44e6b295a489bf5334f1172d1",
+      "type": "Information Disclosure",
+      "severity": "low",
+      "status": "open",
+      "first_seen_run_id": "awz.cookiessett-1786192094",
+      "last_seen_run_id": "awz.cookiessett-1786192094",
+      "resolved_run_id": null,
+      "original_location": {
+        "file": "lib/handlers.php",
+        "line": "16-18,64-66"
+      },
+      "current_location": {
+        "file": "lib/handlers.php",
+        "line": "16-18,64-66"
+      },
+      "latest_vulnerability": {
+        "file": "lib/handlers.php",
+        "line": "16-18,64-66",
+        "type": "Information Disclosure",
+        "severity": "low",
+        "description": "Подозрение: Insecure Deserialization в handlers.php (строки 16-18 и 64-66). Данные читаются из Option::get('awz.cookiessett', 'PARAMS') и передаются в unserialize() с ['allowed_classes'=>false]. Хотя allowed_classes=>false ограничивает instantiation произвольных классов, сериализованные данные могут содержать объектные метаданные, которые при некорректной обработке могут привести к непредвиденному поведению. Данный паттерн является defense-in-depth проблемой, так как источник данных — настройки модуля, доступные только администратору.",
+        "recommendation": "Использовать json_decode()/json_encode() вместо serialize()/unserialize() для хранения структурированных данных в опциях модуля. Это исключит риски, связанные с десериализацией PHP-объектов.",
+        "fix": "Before:\n$strParams = Option::get(\"awz.cookiessett\", 'PARAMS', '', SITE_ID);\n$strArParams = unserialize(\n    $strParams,\n    ['allowed_classes'=>false]\n);\n\nAfter:\n$strParams = Option::get(\"awz.cookiessett\", 'PARAMS', '', SITE_ID);\n$strArParams = json_decode($strParams, true);\nif (!is_array($strArParams)) {\n    $strArParams = [];\n}",
+        "reviewed": {
+          "oldSeverity": "low",
+          "newSeverity": "low",
+          "changed": false,
+          "category": "kept-as-reported",
+          "versionScope": "current",
+          "version": "current",
+          "currentVersionRelevance": "present-in-current-scan",
+          "action": "fix",
+          "confidence": "medium",
+          "rationale": "Severity left unchanged after review; no stronger Bitrix/BUS-specific downgrade condition was identified from the journal text alone."
+        }
+      },
+      "events": [
+        {
+          "run_id": "awz.cookiessett-1786192094",
+          "event": "detected",
+          "at": "2026-08-08T12:29:13+00:00",
+          "location": {
+            "file": "lib/handlers.php",
+            "line": "16-18,64-66"
+          },
+          "status": "open"
+        }
+      ]
+    },
+    {
+      "journal_finding_id": "JF-00003",
+      "fingerprint": "568dda7f609e6d967b05ec6ed0784ce2",
+      "type": "Information Disclosure",
+      "severity": "low",
+      "status": "open",
+      "first_seen_run_id": "awz.cookiessett-1786192094",
+      "last_seen_run_id": "awz.cookiessett-1786192094",
+      "resolved_run_id": null,
+      "original_location": {
+        "file": "options.php",
+        "line": "100,138-140"
+      },
+      "current_location": {
+        "file": "options.php",
+        "line": "100,138-140"
+      },
+      "latest_vulnerability": {
+        "file": "options.php",
+        "line": "100,138-140",
+        "type": "Information Disclosure",
+        "severity": "low",
+        "description": "Подозрение: Insecure Deserialization в options.php (строки 100 и 138-140). Аналогично handlers.php — unserialize() с ['allowed_classes'=>false] для данных из Option. Источник — настройки модуля, доступные только авторизованным администраторам. riskLevel повышен до low из-за того, что код демонстрируется пользователям в textarea (options.php:96-108) как пример для копирования, что может привести к утечке внутренней логики модуля.",
+        "recommendation": "Заменить serialize()/unserialize() на json_encode()/json_decode(). Обновить пример кода в textarea (options.php:96-108) для использования JSON.",
+        "fix": "Before:\n$strArParams = unserialize($strParams,['allowed_classes'=>false]);\n...\n$valParams = unserialize(\n    Option::get($module_id, \"PARAMS\", \"N\",$arSite['LID']),\n    ['allowed_classes'=>false]\n);\n\nAfter:\n$strArParams = json_decode($strParams, true);\nif (!is_array($strArParams)) {\n    $strArParams = [];\n}\n...\n$valParams = json_decode(\n    Option::get($module_id, \"PARAMS\", \"N\",$arSite['LID']),\n    true\n);\nif (!is_array($valParams)) {\n    $valParams = [...];\n}",
+        "reviewed": {
+          "oldSeverity": "low",
+          "newSeverity": "low",
+          "changed": false,
+          "category": "kept-as-reported",
+          "versionScope": "current",
+          "version": "current",
+          "currentVersionRelevance": "present-in-current-scan",
+          "action": "fix",
+          "confidence": "medium",
+          "rationale": "Severity left unchanged after review; no stronger Bitrix/BUS-specific downgrade condition was identified from the journal text alone."
+        }
+      },
+      "events": [
+        {
+          "run_id": "awz.cookiessett-1786192094",
+          "event": "detected",
+          "at": "2026-08-08T12:29:13+00:00",
+          "location": {
+            "file": "options.php",
+            "line": "100,138-140"
+          },
+          "status": "open"
+        }
+      ]
+    }
+  ]
+}

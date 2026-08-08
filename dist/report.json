@@ -1,0 +1,45 @@
+{
+  "success": true,
+  "requestId": "awz.cookiessett-1786192094",
+  "data": {
+    "vulnerabilities": [
+      {
+        "file": "lib/handlers.php",
+        "line": "52",
+        "type": "Command Injection",
+        "severity": "medium",
+        "description": "Подтверждена уязвимость Regex Injection в хуке OnPageStart. Пользовательский паттерн регулярного выражения берётся из настроек модуля (Option::get('awz.cookiessett', 'DSBL_REJ')) и передаётся напрямую в preg_match() без экранирования на строке 52. Администратор может задать произвольный паттерн в настройках админ-панели (options.php:52-53, поле DSBL_REJ). На PHP < 7.0 это позволяет выполнить RCE через модификатор /e. На PHP >= 7.0 (модуль требует PHP >= 8.1, см. options.php:2) основной риск — ReDoS (Denial of Service) через катастрофический бэктрекинг, так как регулярное выражение выполняется на каждом запросе к сайту в хуке OnEndBufferContent, который срабатывает для каждой страницы.",
+        "recommendation": "Экранировать пользовательский ввод перед использованием в preg_match() через preg_quote(). Если требуется поддержка полных регулярных выражений в настройках — валидировать паттерн через preg_match('/^[^\\\\x00-\\\\x1f]+$/', $pattern) перед использованием и ограничить максимальную длину. Добавить таймаут выполнения регулярных выражений.",
+        "fix": "Before:\nif (preg_match($exc, $curPage)) {\n    return;\n}\n\nAfter:\ntry {\n    // Sanitize the pattern to prevent ReDoS and injection\n    $escapedPattern = preg_quote(trim($exc), '#');\n    if ($escapedPattern !== false && preg_match('#' . $escapedPattern . '#i', $curPage)) {\n        return;\n    }\n} catch (\\Exception $e) {\n    // Log error but continue processing\n}"
+      },
+      {
+        "file": "lib/handlers.php",
+        "line": "16-18,64-66",
+        "type": "Information Disclosure",
+        "severity": "low",
+        "description": "Подозрение: Insecure Deserialization в handlers.php (строки 16-18 и 64-66). Данные читаются из Option::get('awz.cookiessett', 'PARAMS') и передаются в unserialize() с ['allowed_classes'=>false]. Хотя allowed_classes=>false ограничивает instantiation произвольных классов, сериализованные данные могут содержать объектные метаданные, которые при некорректной обработке могут привести к непредвиденному поведению. Данный паттерн является defense-in-depth проблемой, так как источник данных — настройки модуля, доступные только администратору.",
+        "recommendation": "Использовать json_decode()/json_encode() вместо serialize()/unserialize() для хранения структурированных данных в опциях модуля. Это исключит риски, связанные с десериализацией PHP-объектов.",
+        "fix": "Before:\n$strParams = Option::get(\"awz.cookiessett\", 'PARAMS', '', SITE_ID);\n$strArParams = unserialize(\n    $strParams,\n    ['allowed_classes'=>false]\n);\n\nAfter:\n$strParams = Option::get(\"awz.cookiessett\", 'PARAMS', '', SITE_ID);\n$strArParams = json_decode($strParams, true);\nif (!is_array($strArParams)) {\n    $strArParams = [];\n}"
+      },
+      {
+        "file": "options.php",
+        "line": "100,138-140",
+        "type": "Information Disclosure",
+        "severity": "low",
+        "description": "Подозрение: Insecure Deserialization в options.php (строки 100 и 138-140). Аналогично handlers.php — unserialize() с ['allowed_classes'=>false] для данных из Option. Источник — настройки модуля, доступные только авторизованным администраторам. riskLevel повышен до low из-за того, что код демонстрируется пользователям в textarea (options.php:96-108) как пример для копирования, что может привести к утечке внутренней логики модуля.",
+        "recommendation": "Заменить serialize()/unserialize() на json_encode()/json_decode(). Обновить пример кода в textarea (options.php:96-108) для использования JSON.",
+        "fix": "Before:\n$strArParams = unserialize($strParams,['allowed_classes'=>false]);\n...\n$valParams = unserialize(\n    Option::get($module_id, \"PARAMS\", \"N\",$arSite['LID']),\n    ['allowed_classes'=>false]\n);\n\nAfter:\n$strArParams = json_decode($strParams, true);\nif (!is_array($strArParams)) {\n    $strArParams = [];\n}\n...\n$valParams = json_decode(\n    Option::get($module_id, \"PARAMS\", \"N\",$arSite['LID']),\n    true\n);\nif (!is_array($valParams)) {\n    $valParams = [...];\n}"
+      }
+    ],
+    "summary": "Обнаружено 3 уязвимости в 2 файлах при анализе 61 файла модуля. Максимальная severity: medium. Основная уязвимость — Regex Injection в lib/handlers.php, позволяющая администратору задать произвольный паттерн регулярного выражения, который выполняется на каждой странице сайта. Также обнаружены 2 случая потенциальной Insecure Deserialization (defense-in-depth) с низким уровнем риска.",
+    "scannedFiles": 61,
+    "riskLevel": "medium",
+    "auditedFiles": [
+      "lib/handlers.php",
+      "lib/app.php",
+      "install/components/cookies.sett/class.php",
+      "lib/access/model/usermodel.php",
+      "options.php"
+    ]
+  }
+}
