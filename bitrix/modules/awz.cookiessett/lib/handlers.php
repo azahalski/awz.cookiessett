@@ -45,15 +45,42 @@ class Handlers {
             mb_strpos(mb_substr($content,-20), '</body>')!==false
         ){
             $curPage = $request->getRequestUri();
-            if ($arExcluded = explode("\n", Option::get("awz.cookiessett", 'DSBL_REJ', '', SITE_ID))) {
+            $disabledSetting = (string)Option::get("awz.cookiessett", 'DSBL_REJ', '', SITE_ID);
+
+            if ($arExcluded = explode("\n", $disabledSetting)) {
                 foreach ($arExcluded as $exc) {
-                    if(!trim($exc) || strlen(trim($exc))<3) continue;
-                    try{
-                        if (preg_match($exc, $curPage)) {
+                    $exc = trim($exc);
+                    if (strlen($exc) < 3) {
+                        continue;
+                    }
+
+                    // --- ЗАЩИТА ОТ ФЛАГА /e ---
+                    // Ищем последний ограничитель и проверяем флаги после него
+                    $lastDelimiterPos = strrpos($exc, $exc[0] ?? '/');
+                    if ($lastDelimiterPos !== false) {
+                        $modifiers = substr($exc, $lastDelimiterPos + 1);
+                        // Если среди модификаторов есть 'e' (без учета регистра), блокируем строку
+                        if (stripos($modifiers, 'e') !== false) {
+                            continue;
+                        }
+                    }
+                    // --------------------------
+
+                    try {
+                        // @ подавляет Warning при ошибках синтаксиса
+                        $match = @preg_match($exc, $curPage);
+
+                        // Если вернулся false — регулярка некорректна, пропускаем её
+                        if ($match === false) {
+                            continue;
+                        }
+
+                        if ($match > 0) {
                             return;
                         }
-                    }catch (\Exception $e){
-
+                    } catch (\Throwable $e) {
+                        // Перехватывает CompileError в PHP 7/8, если регулярка сломала парсер
+                        continue;
                     }
                 }
             }
