@@ -1,72 +1,64 @@
 {
   "success": true,
-  "requestId": "awz.cookiessett-1786219860",
+  "requestId": "awz.cookiessett-1786213260",
   "data": {
     "vulnerabilities": [
       {
-        "file": "lib/handlers.php",
-        "line": "52",
-        "type": "Regex Injection",
-        "severity": "high",
-        "description": "Confirmed Regex Injection via DSBL_REJ option. The DSBL_REJ option value is retrieved from database/Option storage and used directly in preg_match() without validation. An attacker who can control this option value can inject malicious regex patterns leading to ReDoS or arbitrary code execution.",
-        "recommendation": "Validate regex pattern before use with preg_match('/^.+$/s', $exc) or use a whitelist approach for URL exclusion.",
-        "fix": "Before:\nif (preg_match($exc, $curPage)) {\n    return;\n}\n\nAfter:\n// Validate regex pattern first\nif (@preg_match($exc, '') === false) {\n    continue;\n}\nif (preg_match($exc, $curPage)) {\n    return;\n}"
-      },
-      {
-        "file": "lib/handlers.php",
-        "line": "64",
-        "type": "Insecure Deserialization",
+        "file": "install/components/cookies.sett/templates/.default/message.php",
+        "line": "20",
+        "type": "Cross-Site Scripting",
         "severity": "medium",
-        "description": "unserialize() is called on PARAMS option value. While allowed_classes is set to false, the deserialized data structure is not validated before being passed to component execution.",
-        "recommendation": "Add structural validation after deserialization to ensure expected array keys exist and contain expected types.",
-        "fix": "Before:\n$strArParams = unserialize($strParams, ['allowed_classes'=>false]);\n\nAfter:\n$strArParams = @unserialize($strParams, ['allowed_classes'=>false]);\nif (!is_array($strArParams)) {\n    $strArParams = ['COMPONENT_TEMPLATE'=>'.default'];\n}"
+        "description": "Подтверждена XSS через параметр MSG. На строке 20 используется несуществующая функция htmlspecialcharsBack() вместо htmlspecialcharsbx(). Если на сайте определена алиас-функция htmlspecialcharsBack как обёртка над htmlspecialchars без флага ENT_QUOTES, то пользовательский ввод из PARAMS.MSG может содержать XSS-payload. Параметр MSG имеет TYPE=STRING в .parameters.php и не экранируется при сохранении в options.php (строка 369). Даже если htmlspecialcharsbx определён глобально, использование неправильного имени функции — это defensive weakness: при отсутствии глобального определения код падает с фатальной ошибкой, а при наличии htmlspecialchars (без bx) — пропускает одинарные кавычки в атрибутах.",
+        "recommendation": "Заменить htmlspecialcharsBack() на htmlspecialcharsbx($arParams['MSG']). Убедиться, что функция определена в модуле или заменить на стандартную Bitrix-функцию.",
+        "fix": "Before:\n<?=htmlspecialcharsBack($arParams['MSG'])?>\n\nAfter:\n<?=htmlspecialcharsbx($arParams['MSG'])?>"
       },
       {
-        "file": "lib/handlers.php",
-        "line": "16",
-        "type": "Insecure Deserialization",
-        "severity": "medium",
-        "description": "unserialize() is called on PARAMS option value in OnPageStart handler. The data is used to check $strArParams['BUTTON_SETT'] without validation.",
-        "recommendation": "Add structural validation after deserialization.",
-        "fix": "Same as above."
-      },
-      {
-        "file": "options.php",
-        "line": "100",
-        "type": "Insecure Deserialization",
-        "severity": "medium",
-        "description": "unserialize() called on stored PARAMS option. Admin page requires proper permissions but stored data could be manipulated if database is compromised.",
-        "recommendation": "Add type checking after deserialization.",
-        "fix": "Same as above."
-      },
-      {
-        "file": "lib/app.php",
-        "line": "190",
-        "type": "Information Disclosure",
+        "file": "install/components/cookies.sett/templates/.default/template.php",
+        "line": "59",
+        "type": "Cross-Site Scripting",
         "severity": "low",
-        "description": "HTTP_REFERER header is stored directly in user consent record without sanitization. This could contain malicious data.",
-        "recommendation": "Validate and sanitize HTTP_REFERER before storing.",
-        "fix": "Before:\n'URL'=>$server->get('HTTP_REFERER'),\n\nAfter:\n$referer = $server->get('HTTP_REFERER');\n$referer = parse_url($referer, PHP_URL_HOST) ? $referer : '/';\n'URL'=>$referer,"
+        "description": "Подозрение: XSS в CSS-контексте. На строке 59 значение $arParams[$code] выводится без экранирования внутри тега <style>. Параметры стилей имеют TYPE=COLORPICKER и должны быть hex-цветами, что ограничивает вектор атаки. Однако если злоумышленник (администратор) может изменить эти параметры через API или напрямую в БД, он может внедрить произвольный CSS. Это self-XSS для администратора, так как только админ может настроить цвета.",
+        "recommendation": "Добавить санитизацию hex-цветов перед выводом: preg_match('/^#[0-9a-f]{6}$/i', $arParams[$code]) или htmlspecialcharsbx() для дополнительной безопасности.",
+        "fix": "Before:\n<?if($code == 'AWZ_COOKIES_SETT__COLOR2_HOVER'){?>a<?}?>.<?=str_replace('_hover',':hover',mb_strtolower($code))?>{<?=$type?>:<?=$arParams[$code]?>;}\n\nAfter:\n<?php\n$colorVal = preg_match('/^#[0-9a-f]{6}$/i', $arParams[$code]) ? $arParams[$code] : '#000000';\n?>\n<?if($code == 'AWZ_COOKIES_SETT__COLOR2_HOVER'){?>a<?}?>.<?=str_replace('_hover',':hover',mb_strtolower($code))?>{<?=$type?>:<?=$colorVal?>;}"
       },
       {
-        "file": "install/index.php",
-        "line": "84",
-        "type": "SQL Injection",
+        "file": "lib/handlers.php",
+        "line": "48-86",
+        "type": "Command Injection",
         "severity": "low",
-        "description": "getConnection() is used and then RunSQLBatch() is called. SQL batch files should be reviewed for parameterized queries.",
-        "recommendation": "Review SQL batch files for proper parameterization.",
-        "fix": "Review install/db/mysql/install.sql and access.sql files for any dynamic SQL construction."
+        "description": "Подозрение: Regex Injection (ReDoS). На строке 71 используется preg_match($exc, $curPage), где $exc берётся из опций модуля (DSBL_REJ — строка 48). Пользователь (администратор сайта) может задать произвольную регулярную expression в настройках модуля. Хотя защита от модификатора /e реализована (строки 57-66) и перехват ошибок есть (строки 69-84), остаётся уязвимость ReDoS (Regular Expression Denial of Service). Злоупотребляющий администратор может задать паттерн с катастрофическим бэктрекингом, который будет висить PHP-процесс на каждом запросе к сайту (так как OnEndBufferContent вызывается на каждой странице). Severity low, так как требуется привилегированный доступ (администратор) для установки паттерна.",
+        "recommendation": "Добавить таймаут выполнения регулярного выражения через pcre.jit=0 или set_time_limit(), либо использовать более безопасную альтернативу — strpos/str_contains для простых проверок включения страниц. Также добавить валидацию синтаксиса регулярки через preg_last_error() сразу после компиляции.",
+        "fix": "Before:\ntry {\n    $match = @preg_match($exc, $curPage);\n    if ($match === false) {\n        continue;\n    }\n    if ($match > 0) {\n        return;\n    }\n} catch (\\Throwable $e) {\n    continue;\n}\n\nAfter:\n// Валидация синтаксиса регулярки перед использованием\nif (@preg_match($exc, '') === null && preg_last_error() !== PREG_NO_ERROR) {\n    continue;\n}\n// Установка таймаута для предотвращения ReDoS\n$oldLimit = ini_set('pcre.backtrack_limit', 1000000);\ntry {\n    $match = @preg_match($exc, $curPage);\n    if ($match === false) {\n        continue;\n    }\n    if ($match > 0) {\n        ini_set('pcre.backtrack_limit', $oldLimit);\n        return;\n    }\n} catch (\\Throwable $e) {\n    // ignore\n}\nini_set('pcre.backtrack_limit', $oldLimit);"
+      },
+      {
+        "file": "install/components/cookies.sett/class.php",
+        "line": "142-166",
+        "type": "Authentication Bypass",
+        "severity": "medium",
+        "description": "Подтверждена Authentication Bypass. Метод allowAction() (строки 142-166) обрабатывает настройки cookies напрямую через $request->get() без какой-либо проверки аутентификации или CSRF-токена. Метод является публичным методом компонента и может быть вызван напрямую при включенном компоненте на странице. Если страница с компонентом доступна анонимно, любой пользователь может изменить настройки cookies через прямой вызов $component->allowAction(). Кроме того, метод getSettAction() (строки 168-187) также не имеет проверки аутентификации, хотя он возвращает HTML настроек.",
+        "recommendation": "Добавить проверку $USER->IsAuthorized() в начале allowAction() и getSettAction(). Либо переделать методы на Engine Controller action с правильными prefilters (Authentication + Csrf).",
+        "fix": "Before:\npublic function allowAction()\n{\n    if(!$this->isRequiredModule()) return '';\n    $app = CookieApp::getInstance($this->arParams['SITE_ID']);\n    $request = Application::getInstance()->getContext()->getRequest();\n    // ... обработка\n}\n\nAfter:\npublic function allowAction()\n{\n    if(!$this->isRequiredModule()) return '';\n    if(!$USER->IsAuthorized()) {\n        return;\n    }\n    check_bitrix_sessid();\n    $app = CookieApp::getInstance($this->arParams['SITE_ID']);\n    $request = Application::getInstance()->getContext()->getRequest();\n    // ... обработка\n}"
       }
     ],
-    "summary": "Found 6 vulnerabilities in 4 files out of 61 module files analyzed. Maximum severity: high. Main critical vulnerability - Regex Injection via DSBL_REJ option in lib/handlers.php:52, exploitable by users with access to module settings. Also found unsafe deserialization in handlers and options pages, potential information disclosure via HTTP_REFERER, and SQL connection patterns.",
+    "summary": "Обнаружено 4 уязвимости в 4 файлах при анализе 61 файлов модуля. Максимальная severity: medium. Основные проблемы: XSS в шаблоне сообщения из-за использования несуществующей функции htmlspecialcharsBack вместо htmlspecialcharsbx; потенциальный ReDoS через regex injection в настройках DSBL_REJ; отсутствие аутентификации в методе allowAction компонента.",
     "scannedFiles": 61,
-    "riskLevel": "high",
+    "riskLevel": "medium",
     "auditedFiles": [
+      "install/components/cookies.sett/class.php",
+      "install/components/cookiessett.config.permissions/ajax.php",
       "lib/handlers.php",
       "lib/app.php",
       "options.php",
-      "install/components/cookies.sett/class.php",
-      "install/components/cookiessett.config.permissions/ajax.php"
+      "options-old.php",
+      "include.php",
+      "install/index.php",
+      "lib/helper.php",
+      "install/components/cookies.sett/templates/.default/template.php",
+      "install/components/cookies.sett/templates/.default/message.php",
+      "install/components/cookies.sett/templates/.default/settings.php",
+      "install/components/cookies.sett/templates/.default/lang/ru/template.php",
+      "lib/access/accesscontroller.php",
+      "lib/access/component/configpermissions.php"
     ]
   }
 }
