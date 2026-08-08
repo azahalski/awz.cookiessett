@@ -33,6 +33,24 @@
         "reopened_findings": 0,
         "resolved_since_previous_run": 0
       }
+    },
+    {
+      "run_id": "awz.cookiessett-1786213260",
+      "created_at": "2026-08-08T19:36:59+00:00",
+      "archive_sha256": null,
+      "scanner_request_id": "awz.cookiessett-1786213260",
+      "input_summary": "Обнаружено 4 уязвимости в 4 файлах при анализе 61 файлов модуля. Максимальная severity: medium. Основные проблемы: XSS в шаблоне сообщения из-за использования несуществующей функции htmlspecialcharsBack вместо htmlspecialcharsbx; потенциальный ReDoS через regex injection в настройках DSBL_REJ; отсутствие аутентификации в методе allowAction компонента.",
+      "summary": {
+        "current_scan_findings": 4,
+        "severity_counts": {
+          "medium": 2,
+          "low": 2
+        },
+        "new_findings": 0,
+        "still_open_findings": 4,
+        "reopened_findings": 0,
+        "resolved_since_previous_run": 0
+      }
     }
   ],
   "findings": [
@@ -106,6 +124,16 @@
           "status": "false_positive",
           "note": "htmlspecialcharsBack существует внутри ядра битрикс",
           "author": "Andrew Zahalski"
+        },
+        {
+          "run_id": "awz.cookiessett-1786213260",
+          "event": "detected_again",
+          "at": "2026-08-08T19:36:59+00:00",
+          "location": {
+            "file": "install/components/cookies.sett/templates/.default/message.php",
+            "line": "20"
+          },
+          "status": "false_positive"
         }
       ]
     },
@@ -173,6 +201,16 @@
           "status": "open",
           "note": "",
           "author": ""
+        },
+        {
+          "run_id": "awz.cookiessett-1786213260",
+          "event": "detected_again",
+          "at": "2026-08-08T19:36:59+00:00",
+          "location": {
+            "file": "install/components/cookies.sett/templates/.default/template.php",
+            "line": "59"
+          },
+          "status": "open"
         }
       ]
     },
@@ -240,6 +278,16 @@
           "status": "open",
           "note": "",
           "author": ""
+        },
+        {
+          "run_id": "awz.cookiessett-1786213260",
+          "event": "detected_again",
+          "at": "2026-08-08T19:36:59+00:00",
+          "location": {
+            "file": "lib/handlers.php",
+            "line": "48-86"
+          },
+          "status": "open"
         }
       ]
     },
@@ -313,6 +361,16 @@
           "status": "false_positive",
           "note": "метод публичный для неавторизованных",
           "author": "Andrew Zahalski"
+        },
+        {
+          "run_id": "awz.cookiessett-1786213260",
+          "event": "detected_again",
+          "at": "2026-08-08T19:36:59+00:00",
+          "location": {
+            "file": "install/components/cookies.sett/class.php",
+            "line": "142-166"
+          },
+          "status": "false_positive"
         }
       ]
     }
