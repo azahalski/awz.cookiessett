@@ -5,49 +5,30 @@
   },
   "current_state": {
     "status": "needs_review",
-    "last_run_id": "awz.cookiessett-1786213260",
+    "last_run_id": "awz.cookiessett-1786266330",
     "archive_sha256": null,
-    "open_findings": 2,
+    "open_findings": 0,
     "blocking_findings_open": 0,
-    "false_positive_findings": 2,
-    "accepted_risk_findings": 0,
+    "false_positive_findings": 0,
+    "accepted_risk_findings": 1,
     "fixed_findings": 0,
     "removed_findings": 0,
-    "total_findings": 4
+    "total_findings": 1
   },
   "runs": [
     {
-      "run_id": "awz.cookiessett-1786213260",
-      "created_at": "2026-08-08T18:22:09+00:00",
+      "run_id": "awz.cookiessett-1786266330",
+      "created_at": "2026-08-09T06:06:51+00:00",
       "archive_sha256": null,
-      "scanner_request_id": "awz.cookiessett-1786213260",
-      "input_summary": "Обнаружено 4 уязвимости в 4 файлах при анализе 61 файлов модуля. Максимальная severity: medium. Основные проблемы: XSS в шаблоне сообщения из-за использования несуществующей функции htmlspecialcharsBack вместо htmlspecialcharsbx; потенциальный ReDoS через regex injection в настройках DSBL_REJ; отсутствие аутентификации в методе allowAction компонента.",
+      "scanner_request_id": "awz.cookiessett-1786266330",
+      "input_summary": "Found 3 vulnerabilities in 3 files out of 61 scanned. Max severity: medium.",
       "summary": {
-        "current_scan_findings": 4,
+        "current_scan_findings": 1,
         "severity_counts": {
-          "medium": 2,
-          "low": 2
+          "medium": 1
         },
-        "new_findings": 4,
+        "new_findings": 1,
         "still_open_findings": 0,
-        "reopened_findings": 0,
-        "resolved_since_previous_run": 0
-      }
-    },
-    {
-      "run_id": "awz.cookiessett-1786213260",
-      "created_at": "2026-08-08T19:36:59+00:00",
-      "archive_sha256": null,
-      "scanner_request_id": "awz.cookiessett-1786213260",
-      "input_summary": "Обнаружено 4 уязвимости в 4 файлах при анализе 61 файлов модуля. Максимальная severity: medium. Основные проблемы: XSS в шаблоне сообщения из-за использования несуществующей функции htmlspecialcharsBack вместо htmlspecialcharsbx; потенциальный ReDoS через regex injection в настройках DSBL_REJ; отсутствие аутентификации в методе allowAction компонента.",
-      "summary": {
-        "current_scan_findings": 4,
-        "severity_counts": {
-          "medium": 2,
-          "low": 2
-        },
-        "new_findings": 0,
-        "still_open_findings": 4,
         "reopened_findings": 0,
         "resolved_since_previous_run": 0
       }
@@ -56,192 +37,32 @@
   "findings": [
     {
       "journal_finding_id": "JF-00001",
-      "fingerprint": "62079fbe61d8aa24ee60445cfc956b0d",
-      "type": "Cross-Site Scripting",
+      "fingerprint": "af0bb94cf77677aa3f60d0f0a016792a",
+      "type": "Command Injection",
       "severity": "medium",
-      "status": "false_positive",
-      "first_seen_run_id": "awz.cookiessett-1786213260",
-      "last_seen_run_id": "awz.cookiessett-1786213260",
+      "status": "accepted_risk",
+      "first_seen_run_id": "awz.cookiessett-1786266330",
+      "last_seen_run_id": "awz.cookiessett-1786266330",
       "resolved_run_id": null,
       "original_location": {
-        "file": "install/components/cookies.sett/templates/.default/message.php",
-        "line": "20"
+        "file": "lib/handlers.php",
+        "line": "48-91"
       },
       "current_location": {
-        "file": "install/components/cookies.sett/templates/.default/message.php",
-        "line": "20"
+        "file": "lib/handlers.php",
+        "line": "48-91"
       },
       "latest_vulnerability": {
-        "file": "install/components/cookies.sett/templates/.default/message.php",
-        "line": "20",
-        "type": "Cross-Site Scripting",
+        "file": "lib/handlers.php",
+        "line": "48-91",
+        "type": "Command Injection",
         "severity": "medium",
-        "description": "Подтверждена XSS через параметр MSG. На строке 20 используется несуществующая функция htmlspecialcharsBack() вместо htmlspecialcharsbx(). Если на сайте определена алиас-функция htmlspecialcharsBack как обёртка над htmlspecialchars без флага ENT_QUOTES, то пользовательский ввод из PARAMS.MSG может содержать XSS-payload. Параметр MSG имеет TYPE=STRING в .parameters.php и не экранируется при сохранении в options.php (строка 369). Даже если htmlspecialcharsbx определён глобально, использование неправильного имени функции — это defensive weakness: при отсутствии глобального определения код падает с фатальной ошибкой, а при наличии htmlspecialchars (без bx) — пропускает одинарные кавычки в атрибутах.",
-        "recommendation": "Заменить htmlspecialcharsBack() на htmlspecialcharsbx($arParams['MSG']). Убедиться, что функция определена в модуле или заменить на стандартную Bitrix-функцию.",
-        "fix": "Before:\n<?=htmlspecialcharsBack($arParams['MSG'])?>\n\nAfter:\n<?=htmlspecialcharsbx($arParams['MSG'])?>",
+        "description": "Confirmed Regex Injection. User input from DSBL_REJ option (stored in DB) is passed directly to preg_match(). Although protection against /e flag exists (lines 57-67), an attacker can still cause ReDoS or use other dangerous regex constructs.",
+        "recommendation": "Replace preg_match() with safer string comparison methods. Use strpos() or fnmatch() for simple path matching.",
+        "fix": "Before: $match = @preg_match($exc, $curPage);\\nAfter: if (fnmatch($exc, $curPage, FNM_CASEFOLD)) { return; }",
         "reviewed": {
           "oldSeverity": "medium",
           "newSeverity": "medium",
-          "changed": false,
-          "category": "public-reflected-xss",
-          "versionScope": "current",
-          "version": "current",
-          "currentVersionRelevance": "present-in-current-scan",
-          "action": "fix",
-          "confidence": "high",
-          "rationale": "Set to medium because reflected XSS is significant but not high under the BUS Marketplace triage policy unless chained to stronger impact proven outside the journal text."
-        },
-        "partner_disposition": {
-          "status": "false_positive",
-          "note": "htmlspecialcharsBack существует внутри ядра битрикс",
-          "author": "Andrew Zahalski",
-          "updated_at": "2026-08-08T18:39:19+00:00"
-        }
-      },
-      "events": [
-        {
-          "run_id": "awz.cookiessett-1786213260",
-          "event": "detected",
-          "at": "2026-08-08T18:22:09+00:00",
-          "location": {
-            "file": "install/components/cookies.sett/templates/.default/message.php",
-            "line": "20"
-          },
-          "status": "open"
-        },
-        {
-          "run_id": "awz.cookiessett-1786213260",
-          "event": "partner_disposition_updated",
-          "at": "2026-08-08T18:27:15+00:00",
-          "status": "false_positive",
-          "note": "htmlspecialcharsBack существует внутри ядра битрикс",
-          "author": "Andrew Zahalski"
-        },
-        {
-          "run_id": "awz.cookiessett-1786213260",
-          "event": "partner_disposition_updated",
-          "at": "2026-08-08T18:39:19+00:00",
-          "status": "false_positive",
-          "note": "htmlspecialcharsBack существует внутри ядра битрикс",
-          "author": "Andrew Zahalski"
-        },
-        {
-          "run_id": "awz.cookiessett-1786213260",
-          "event": "detected_again",
-          "at": "2026-08-08T19:36:59+00:00",
-          "location": {
-            "file": "install/components/cookies.sett/templates/.default/message.php",
-            "line": "20"
-          },
-          "status": "false_positive"
-        }
-      ]
-    },
-    {
-      "journal_finding_id": "JF-00002",
-      "fingerprint": "a1528a9ba0fc9ea4a866b6734f6c8705",
-      "type": "Cross-Site Scripting",
-      "severity": "low",
-      "status": "open",
-      "first_seen_run_id": "awz.cookiessett-1786213260",
-      "last_seen_run_id": "awz.cookiessett-1786213260",
-      "resolved_run_id": null,
-      "original_location": {
-        "file": "install/components/cookies.sett/templates/.default/template.php",
-        "line": "59"
-      },
-      "current_location": {
-        "file": "install/components/cookies.sett/templates/.default/template.php",
-        "line": "59"
-      },
-      "latest_vulnerability": {
-        "file": "install/components/cookies.sett/templates/.default/template.php",
-        "line": "59",
-        "type": "Cross-Site Scripting",
-        "severity": "low",
-        "description": "Подозрение: XSS в CSS-контексте. На строке 59 значение $arParams[$code] выводится без экранирования внутри тега <style>. Параметры стилей имеют TYPE=COLORPICKER и должны быть hex-цветами, что ограничивает вектор атаки. Однако если злоумышленник (администратор) может изменить эти параметры через API или напрямую в БД, он может внедрить произвольный CSS. Это self-XSS для администратора, так как только админ может настроить цвета.",
-        "recommendation": "Добавить санитизацию hex-цветов перед выводом: preg_match('/^#[0-9a-f]{6}$/i', $arParams[$code]) или htmlspecialcharsbx() для дополнительной безопасности.",
-        "fix": "Before:\n<?if($code == 'AWZ_COOKIES_SETT__COLOR2_HOVER'){?>a<?}?>.<?=str_replace('_hover',':hover',mb_strtolower($code))?>{<?=$type?>:<?=$arParams[$code]?>;}\n\nAfter:\n<?php\n$colorVal = preg_match('/^#[0-9a-f]{6}$/i', $arParams[$code]) ? $arParams[$code] : '#000000';\n?>\n<?if($code == 'AWZ_COOKIES_SETT__COLOR2_HOVER'){?>a<?}?>.<?=str_replace('_hover',':hover',mb_strtolower($code))?>{<?=$type?>:<?=$colorVal?>;}",
-        "reviewed": {
-          "oldSeverity": "low",
-          "newSeverity": "low",
-          "changed": false,
-          "category": "xss-unclear-source",
-          "versionScope": "current",
-          "version": "current",
-          "currentVersionRelevance": "present-in-current-scan",
-          "action": "validate-source-and-fix-escaping",
-          "confidence": "low",
-          "rationale": "Adjusted conservatively because the journal does not clearly prove a low-privileged or public payload source. Confirm source permissions before treating as a blocker."
-        }
-      },
-      "events": [
-        {
-          "run_id": "awz.cookiessett-1786213260",
-          "event": "detected",
-          "at": "2026-08-08T18:22:09+00:00",
-          "location": {
-            "file": "install/components/cookies.sett/templates/.default/template.php",
-            "line": "59"
-          },
-          "status": "open"
-        },
-        {
-          "run_id": "awz.cookiessett-1786213260",
-          "event": "partner_disposition_updated",
-          "at": "2026-08-08T18:27:15+00:00",
-          "status": "open",
-          "note": "",
-          "author": ""
-        },
-        {
-          "run_id": "awz.cookiessett-1786213260",
-          "event": "partner_disposition_updated",
-          "at": "2026-08-08T18:39:19+00:00",
-          "status": "open",
-          "note": "",
-          "author": ""
-        },
-        {
-          "run_id": "awz.cookiessett-1786213260",
-          "event": "detected_again",
-          "at": "2026-08-08T19:36:59+00:00",
-          "location": {
-            "file": "install/components/cookies.sett/templates/.default/template.php",
-            "line": "59"
-          },
-          "status": "open"
-        }
-      ]
-    },
-    {
-      "journal_finding_id": "JF-00003",
-      "fingerprint": "2ea2c0c20b652a2e244b82ef71709685",
-      "type": "Command Injection",
-      "severity": "low",
-      "status": "open",
-      "first_seen_run_id": "awz.cookiessett-1786213260",
-      "last_seen_run_id": "awz.cookiessett-1786213260",
-      "resolved_run_id": null,
-      "original_location": {
-        "file": "lib/handlers.php",
-        "line": "48-86"
-      },
-      "current_location": {
-        "file": "lib/handlers.php",
-        "line": "48-86"
-      },
-      "latest_vulnerability": {
-        "file": "lib/handlers.php",
-        "line": "48-86",
-        "type": "Command Injection",
-        "severity": "low",
-        "description": "Подозрение: Regex Injection (ReDoS). На строке 71 используется preg_match($exc, $curPage), где $exc берётся из опций модуля (DSBL_REJ — строка 48). Пользователь (администратор сайта) может задать произвольную регулярную expression в настройках модуля. Хотя защита от модификатора /e реализована (строки 57-66) и перехват ошибок есть (строки 69-84), остаётся уязвимость ReDoS (Regular Expression Denial of Service). Злоупотребляющий администратор может задать паттерн с катастрофическим бэктрекингом, который будет висить PHP-процесс на каждом запросе к сайту (так как OnEndBufferContent вызывается на каждой странице). Severity low, так как требуется привилегированный доступ (администратор) для установки паттерна.",
-        "recommendation": "Добавить таймаут выполнения регулярного выражения через pcre.jit=0 или set_time_limit(), либо использовать более безопасную альтернативу — strpos/str_contains для простых проверок включения страниц. Также добавить валидацию синтаксиса регулярки через preg_last_error() сразу после компиляции.",
-        "fix": "Before:\ntry {\n    $match = @preg_match($exc, $curPage);\n    if ($match === false) {\n        continue;\n    }\n    if ($match > 0) {\n        return;\n    }\n} catch (\\Throwable $e) {\n    continue;\n}\n\nAfter:\n// Валидация синтаксиса регулярки перед использованием\nif (@preg_match($exc, '') === null && preg_last_error() !== PREG_NO_ERROR) {\n    continue;\n}\n// Установка таймаута для предотвращения ReDoS\n$oldLimit = ini_set('pcre.backtrack_limit', 1000000);\ntry {\n    $match = @preg_match($exc, $curPage);\n    if ($match === false) {\n        continue;\n    }\n    if ($match > 0) {\n        ini_set('pcre.backtrack_limit', $oldLimit);\n        return;\n    }\n} catch (\\Throwable $e) {\n    // ignore\n}\nini_set('pcre.backtrack_limit', $oldLimit);",
-        "reviewed": {
-          "oldSeverity": "low",
-          "newSeverity": "low",
           "changed": false,
           "category": "kept-as-reported",
           "versionScope": "current",
@@ -250,127 +71,32 @@
           "action": "fix",
           "confidence": "medium",
           "rationale": "Severity left unchanged after review; no stronger Bitrix/BUS-specific downgrade condition was identified from the journal text alone."
-        }
-      },
-      "events": [
-        {
-          "run_id": "awz.cookiessett-1786213260",
-          "event": "detected",
-          "at": "2026-08-08T18:22:09+00:00",
-          "location": {
-            "file": "lib/handlers.php",
-            "line": "48-86"
-          },
-          "status": "open"
-        },
-        {
-          "run_id": "awz.cookiessett-1786213260",
-          "event": "partner_disposition_updated",
-          "at": "2026-08-08T18:27:15+00:00",
-          "status": "open",
-          "note": "",
-          "author": ""
-        },
-        {
-          "run_id": "awz.cookiessett-1786213260",
-          "event": "partner_disposition_updated",
-          "at": "2026-08-08T18:39:19+00:00",
-          "status": "open",
-          "note": "",
-          "author": ""
-        },
-        {
-          "run_id": "awz.cookiessett-1786213260",
-          "event": "detected_again",
-          "at": "2026-08-08T19:36:59+00:00",
-          "location": {
-            "file": "lib/handlers.php",
-            "line": "48-86"
-          },
-          "status": "open"
-        }
-      ]
-    },
-    {
-      "journal_finding_id": "JF-00004",
-      "fingerprint": "9784af858457a2831e444e084e691c66",
-      "type": "Authentication Bypass",
-      "severity": "medium",
-      "status": "false_positive",
-      "first_seen_run_id": "awz.cookiessett-1786213260",
-      "last_seen_run_id": "awz.cookiessett-1786213260",
-      "resolved_run_id": null,
-      "original_location": {
-        "file": "install/components/cookies.sett/class.php",
-        "line": "142-166"
-      },
-      "current_location": {
-        "file": "install/components/cookies.sett/class.php",
-        "line": "142-166"
-      },
-      "latest_vulnerability": {
-        "file": "install/components/cookies.sett/class.php",
-        "line": "142-166",
-        "type": "Authentication Bypass",
-        "severity": "medium",
-        "description": "Подтверждена Authentication Bypass. Метод allowAction() (строки 142-166) обрабатывает настройки cookies напрямую через $request->get() без какой-либо проверки аутентификации или CSRF-токена. Метод является публичным методом компонента и может быть вызван напрямую при включенном компоненте на странице. Если страница с компонентом доступна анонимно, любой пользователь может изменить настройки cookies через прямой вызов $component->allowAction(). Кроме того, метод getSettAction() (строки 168-187) также не имеет проверки аутентификации, хотя он возвращает HTML настроек.",
-        "recommendation": "Добавить проверку $USER->IsAuthorized() в начале allowAction() и getSettAction(). Либо переделать методы на Engine Controller action с правильными prefilters (Authentication + Csrf).",
-        "fix": "Before:\npublic function allowAction()\n{\n    if(!$this->isRequiredModule()) return '';\n    $app = CookieApp::getInstance($this->arParams['SITE_ID']);\n    $request = Application::getInstance()->getContext()->getRequest();\n    // ... обработка\n}\n\nAfter:\npublic function allowAction()\n{\n    if(!$this->isRequiredModule()) return '';\n    if(!$USER->IsAuthorized()) {\n        return;\n    }\n    check_bitrix_sessid();\n    $app = CookieApp::getInstance($this->arParams['SITE_ID']);\n    $request = Application::getInstance()->getContext()->getRequest();\n    // ... обработка\n}",
-        "reviewed": {
-          "oldSeverity": "medium",
-          "newSeverity": "medium",
-          "changed": false,
-          "category": "authenticated-or-limited-authorization-bypass",
-          "versionScope": "current",
-          "version": "current",
-          "currentVersionRelevance": "present-in-current-scan",
-          "action": "verify-on-latest-version",
-          "confidence": "medium",
-          "rationale": "Set to medium because the finding describes authorization bypass or privilege misuse, but not a direct high-impact IDOR, financial bug, or confirmed account takeover in the journal text."
         },
         "partner_disposition": {
-          "status": "false_positive",
-          "note": "метод публичный для неавторизованных",
+          "status": "accepted_risk",
+          "note": "Шаблон заполняет администратор на странице настроек модуля",
           "author": "Andrew Zahalski",
-          "updated_at": "2026-08-08T18:39:19+00:00"
+          "updated_at": "2026-08-09T06:10:12+00:00"
         }
       },
       "events": [
         {
-          "run_id": "awz.cookiessett-1786213260",
+          "run_id": "awz.cookiessett-1786266330",
           "event": "detected",
-          "at": "2026-08-08T18:22:09+00:00",
+          "at": "2026-08-09T06:06:51+00:00",
           "location": {
-            "file": "install/components/cookies.sett/class.php",
-            "line": "142-166"
+            "file": "lib/handlers.php",
+            "line": "48-91"
           },
           "status": "open"
         },
         {
-          "run_id": "awz.cookiessett-1786213260",
+          "run_id": "awz.cookiessett-1786266330",
           "event": "partner_disposition_updated",
-          "at": "2026-08-08T18:27:15+00:00",
-          "status": "open",
-          "note": "",
-          "author": ""
-        },
-        {
-          "run_id": "awz.cookiessett-1786213260",
-          "event": "partner_disposition_updated",
-          "at": "2026-08-08T18:39:19+00:00",
-          "status": "false_positive",
-          "note": "метод публичный для неавторизованных",
+          "at": "2026-08-09T06:10:12+00:00",
+          "status": "accepted_risk",
+          "note": "Шаблон заполняет администратор на странице настроек модуля",
           "author": "Andrew Zahalski"
-        },
-        {
-          "run_id": "awz.cookiessett-1786213260",
-          "event": "detected_again",
-          "at": "2026-08-08T19:36:59+00:00",
-          "location": {
-            "file": "install/components/cookies.sett/class.php",
-            "line": "142-166"
-          },
-          "status": "false_positive"
         }
       ]
     }
