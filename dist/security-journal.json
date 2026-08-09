@@ -32,6 +32,23 @@
         "reopened_findings": 0,
         "resolved_since_previous_run": 0
       }
+    },
+    {
+      "run_id": "awz.cookiessett-1786266330",
+      "created_at": "2026-08-09T06:19:32+00:00",
+      "archive_sha256": null,
+      "scanner_request_id": "awz.cookiessett-1786266330",
+      "input_summary": "Found 3 vulnerabilities in 3 files out of 61 scanned. Max severity: medium.",
+      "summary": {
+        "current_scan_findings": 1,
+        "severity_counts": {
+          "medium": 1
+        },
+        "new_findings": 0,
+        "still_open_findings": 1,
+        "reopened_findings": 0,
+        "resolved_since_previous_run": 0
+      }
     }
   ],
   "findings": [
@@ -97,6 +114,16 @@
           "status": "accepted_risk",
           "note": "Шаблон заполняет администратор на странице настроек модуля",
           "author": "Andrew Zahalski"
+        },
+        {
+          "run_id": "awz.cookiessett-1786266330",
+          "event": "detected_again",
+          "at": "2026-08-09T06:19:32+00:00",
+          "location": {
+            "file": "lib/handlers.php",
+            "line": "48-91"
+          },
+          "status": "accepted_risk"
         }
       ]
     }
